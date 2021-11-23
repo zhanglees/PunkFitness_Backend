@@ -22,7 +22,6 @@ public class PengkeException extends RuntimeException implements Serializable {
     }
 
 
-
     public PengkeException(Integer code) {
 
         this.code = code;
