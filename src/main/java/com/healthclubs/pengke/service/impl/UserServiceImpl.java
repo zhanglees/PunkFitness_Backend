@@ -1,5 +1,4 @@
 package com.healthclubs.pengke.service.impl;
-
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.healthclubs.pengke.entity.StudentAndCoach;
 import com.healthclubs.pengke.entity.UserInfo;
@@ -9,10 +8,7 @@ import com.healthclubs.pengke.service.IStudentAndCoachService;
 import com.healthclubs.pengke.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.Date;
 import java.util.List;
@@ -49,6 +45,23 @@ public class UserServiceImpl extends ServiceImpl<IUserMapper, UserInfo>
             throw e;
         }
         return  usermodel;
+    }
+
+    /**
+     * 根据教练id得到 教练管理的学员
+     */
+    @Override
+    public List<UserInfo> getTrainerInfoByCoachId(String coachId) {
+
+        try
+        {
+            List<UserInfo> userData = baseMapper.getTrainerByCoachId(coachId);
+            return  userData;
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
     }
 
 

@@ -43,8 +43,8 @@ import lombok.experimental.Accessors;
  *
  * </p>
  *
- * @author 团子
- * @since 2019-05-17
+ * @author daniel.tz
+ * @since new2021-11-22
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

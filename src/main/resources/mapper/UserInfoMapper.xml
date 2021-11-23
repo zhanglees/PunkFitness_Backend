@@ -24,8 +24,15 @@
         SELECT * FROM userInfo
     </select>
 
+     <select id="getTrainerByCoachId" parameterType="String"
+             resultType="com.healthclubs.pengke.entity.UserInfo">
+        select * from userinfo as a inner join
+         studentandcoach as b on
+         a.id = b.student_id where b.coach_id = #{coachId}
 
-    <!-- 通用查询结果列 -->
+     </select>
+
+     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id,wxid,head_img,phone,birthday,sex,user_name, age, email,customer_tag,remarks,coustom_level
 

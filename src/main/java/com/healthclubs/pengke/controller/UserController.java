@@ -63,4 +63,24 @@ public class UserController extends BaseController{
         }
     }
 
+
+    //注册
+    @ApiOperation(value = "/getTrainerInfoByCoachId", notes = "根据教练id得到学员id")
+    @PostMapping(value = "/getTrainerInfoByCoachId")
+    public  Result getTrainerInfoByCoachId(String coachId)
+    {
+        try {
+            return getResult(ResponseCode.SUCCESS_PROCESSED,
+                    userService.getTrainerInfoByCoachId(coachId));
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
+
+
+
 }
