@@ -30,7 +30,7 @@ public class Questionitem  extends Model<Questionitem> {
 
     public String describes;
 
-    public String isAnswer;
+    public Integer isAnswer;
 
     public String ownerId;
 
