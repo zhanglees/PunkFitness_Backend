@@ -23,18 +23,32 @@ public class UserController extends BaseController{
     @Autowired
     IUserService userService;
 
-    @RequestMapping("getUserAll")
-    @ResponseBody
-    public List<UserInfo> getUserAll()
+    @RequestMapping("/getUserAll")
+    public Result getUserAll()
     {
-         return this.userService.getUserAll();
+        try {
+            return getResult(ResponseCode.SUCCESS_PROCESSED,
+                    userService.getUserAll());
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+
     }
 
     @RequestMapping("/byid")
-    public Object byid(String id) {
-        Object t = userService.getById(id);
-        //  return userService.getById(id);
-        return t;
+    public Result byid(String id) {
+        try {
+            return getResult(ResponseCode.SUCCESS_PROCESSED,
+                    userService.getById(id));
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
     }
 
 
