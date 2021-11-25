@@ -40,6 +40,10 @@ public class ResponseCode {
 
     public static final Integer USER_OVER = 1003;
     public static final Integer USER_COACHId_EMPTY = 1007;
+    public static final Integer APPOINTTIME_BE_OVERDUE = 1008;
     public static final Integer NOT_BELONG_ACTIVE = 1004;
+    public static final Integer DBERROR_INSERT_ERROR = 20000;
+    public static final Integer DBERROR_INSERT_APPOINTMENTID_ForeignkeyError = 20007;
+
 
 }

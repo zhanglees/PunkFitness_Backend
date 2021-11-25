@@ -1,6 +1,5 @@
 package com.healthclubs.pengke.controller;
 
-import com.healthclubs.pengke.entity.UserInfo;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
@@ -11,8 +10,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -93,6 +90,7 @@ public class UserController extends BaseController{
             return getResult(ResponseCode.GENERIC_FAILURE);
         }
     }
+
 
 
 
