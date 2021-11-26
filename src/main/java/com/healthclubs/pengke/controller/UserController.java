@@ -78,11 +78,12 @@ public class UserController extends BaseController{
     //注册
     @ApiOperation(value = "/getTrainerInfoByCoachId", notes = "根据教练id得到学员id")
     @PostMapping(value = "/getTrainerInfoByCoachId")
-    public  Result getTrainerInfoByCoachId(String coachId)
+    public  Result getTrainerInfoByCoachId(String coachId,Integer trainerType)
     {
         try {
             return getResult(ResponseCode.SUCCESS_PROCESSED,
-                    userService.getTrainerInfoByCoachId(coachId));
+                    userService.getTrainerInfoByCoachIdAndlevel(coachId,trainerType));
+
         } catch (PengkeException e) {
             return getResult(e.getCode());
         } catch (Exception e) {

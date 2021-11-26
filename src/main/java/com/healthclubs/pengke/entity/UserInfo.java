@@ -120,6 +120,11 @@ public class UserInfo  extends Model<UserInfo>{
         return null;
     }
 
+    @TableField(exist = false)
+    private Integer appointmentNum;
+
+    @TableField(exist = false)
+    private Integer singInNum;
 }
 
 

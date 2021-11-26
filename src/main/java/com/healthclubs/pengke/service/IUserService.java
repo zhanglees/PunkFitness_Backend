@@ -13,4 +13,6 @@ public interface IUserService  extends IService<UserInfo>{
     RegisterDto register(RegisterDto usermodel);
 
     List<UserInfo> getTrainerInfoByCoachId(String coachId);
+
+    List<UserInfo> getTrainerInfoByCoachIdAndlevel(String coachId,Integer customLevel);
 }
