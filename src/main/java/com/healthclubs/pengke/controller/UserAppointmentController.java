@@ -1,5 +1,7 @@
 package com.healthclubs.pengke.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.healthclubs.pengke.entity.UserAppointment;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
@@ -29,7 +31,6 @@ public class UserAppointmentController extends BaseController {
 
     @Autowired
     IUserAppointmentHistoryService userAppointmentHistoryService;
-
 
     //预约
     @ApiOperation(value = "/appointment", notes = "预约")
@@ -86,5 +87,23 @@ public class UserAppointmentController extends BaseController {
         }
     }
 
+
+    //根据时间得到预约
+    @ApiOperation(value = "/getAppointmentAllByDate", notes = "根据时间得到预约")
+    @RequestMapping("/getAppointmentAllByDate")
+    public Result getAppointmentAllByDate(String userId,Date date)
+    {
+        try {
+            return getResult(ResponseCode.SUCCESS_PROCESSED,
+                    userAppointmentService.list(new QueryWrapper<UserAppointment>()
+                    .apply("TO_DAYS(appointment_time)-TO_DAYS({0}) = 0", date).eq("user_id",userId)));
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+
+    }
 
 }
