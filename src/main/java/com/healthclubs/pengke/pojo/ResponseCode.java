@@ -45,5 +45,7 @@ public class ResponseCode {
     public static final Integer DBERROR_INSERT_ERROR = 20000;
     public static final Integer DBERROR_INSERT_APPOINTMENTID_ForeignkeyError = 20007;
 
+    public static final Integer FEEDBACK_ASSESSMENTID_EMPTY = 1009;
+
 
 }
