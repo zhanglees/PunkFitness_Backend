@@ -29,7 +29,7 @@ public class UserAssessmentFeedback extends Model<UserAssessmentFeedback> {
 
     @TableId
     @TableField(value = "user_assessmentfeedback_id")
-    public String userAssessmentFeedbackId;
+    public String userAssessmentfeedbackId;
 
     public String userId;
 

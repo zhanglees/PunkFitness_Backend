@@ -31,8 +31,9 @@ public class AssessmentContent extends Model<AssessmentContent> {
 
     public String assessmentName;
 
+
     /**
-     * 采集的类型 0 静态 1动态
+     * 0静态 1动态
      */
     public Integer assessmentType;
 
