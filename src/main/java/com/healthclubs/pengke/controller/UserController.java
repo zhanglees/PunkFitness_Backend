@@ -1,5 +1,6 @@
 package com.healthclubs.pengke.controller;
 
+import com.healthclubs.pengke.entity.UserInfo;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
@@ -93,6 +94,25 @@ public class UserController extends BaseController{
     }
 
 
+    //转成正式会员
+    @ApiOperation(value = "/transformMember", notes = "转换正式会员")
+    @PostMapping(value = "/transformMember")
+    public  Result transformMember(@RequestBody UserInfo userInfo)
+    {
+        try {
+            Integer customeLevel = 1; //正式会员。
+            userInfo.setCoustomLevel(customeLevel);
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,
+                    userService.updateById(userInfo));
+
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
 
 
 

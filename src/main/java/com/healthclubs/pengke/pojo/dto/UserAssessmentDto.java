@@ -1,6 +1,5 @@
 package com.healthclubs.pengke.pojo.dto;
 
-import com.healthclubs.pengke.entity.AssessmentContent;
 import com.healthclubs.pengke.entity.UserAssessmentFeedback;
 import com.healthclubs.pengke.entity.UserAssessmentResource;
 
