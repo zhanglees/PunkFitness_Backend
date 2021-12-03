@@ -37,6 +37,7 @@ public class ResponseCode {
     public static final Integer SPECIAL_TOPIC_ACTIVITY_NULL = 100;
     public static final Integer CLASS_CODE_NULL = 1000;
     public static final Integer USER_INTO_CLASS_REDO = 1001;
+    public static final Integer PARAMETER_CANNOT_EMPTY = 1002;
 
     public static final Integer USER_OVER = 1003;
     public static final Integer USER_COACHId_EMPTY = 1007;
@@ -46,6 +47,8 @@ public class ResponseCode {
     public static final Integer DBERROR_INSERT_APPOINTMENTID_ForeignkeyError = 20007;
 
     public static final Integer FEEDBACK_ASSESSMENTID_EMPTY = 1009;
+
+
 
 
 }

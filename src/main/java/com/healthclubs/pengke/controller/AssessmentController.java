@@ -91,7 +91,7 @@ public class AssessmentController extends BaseController {
     }
 
 
-    //创建用户
+    //增加用户评估
     @ApiOperation(value = "/addUserAssessment", notes = "添加用户评估测试")
     @PostMapping(value = "/addUserAssessment")
     public Result addUserAssessment(@RequestBody UserAssessmentDto userAssessmentDto) {
