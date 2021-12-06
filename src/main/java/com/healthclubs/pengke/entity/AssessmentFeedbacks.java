@@ -9,6 +9,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * <p>
  *评估问卷 反馈
@@ -23,7 +26,6 @@ import lombok.experimental.Accessors;
 @TableName("assessmentfeedbacks")
 public class AssessmentFeedbacks extends Model<AssessmentFeedbacks> {
 
-
     @TableId
     @TableField(value = "assessment_feedback_id")
     public String assessmentFeedbackId;
@@ -36,4 +38,10 @@ public class AssessmentFeedbacks extends Model<AssessmentFeedbacks> {
 
     public String owner;
 
+    public String parentId;
+
+    public Integer showOrder;
+
+    @TableField(exist = false)
+    public List<AssessmentFeedbacks> childFeedbacks = new ArrayList<>();
 }

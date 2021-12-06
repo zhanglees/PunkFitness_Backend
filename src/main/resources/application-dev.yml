@@ -1,5 +1,7 @@
 server:
   port: 8023
+upload:
+  file-space: C:\Project\mywork\newjiaoyu\resource
 spring:
   #    国际化文件位置
   messages.basename: i18n/message

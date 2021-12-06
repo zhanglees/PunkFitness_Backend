@@ -48,9 +48,23 @@ public class AssessmentController extends BaseController {
 
             if (assessmentContents != null && assessmentContents.size() > 0) {
                 assessmentContents.stream().forEach(item -> {
-                    List<AssessmentFeedbacks> assessmentFeedbacks = assessmentFeedbacksService.list(new QueryWrapper<AssessmentFeedbacks>().eq(
-                            "owner", coachId).or().eq("owner", "system").eq("assessment_id", item.assessmentId)
+                    List<AssessmentFeedbacks> assessmentFeedbacks = assessmentFeedbacksService.list(new
+                            QueryWrapper<AssessmentFeedbacks>().eq(
+                            "owner", coachId).or().eq("owner", "system").eq(
+                                    "assessment_id", item.assessmentId)
                     );
+
+                    if(assessmentFeedbacks!=null && assessmentFeedbacks.size()>0)
+                    {
+                        assessmentFeedbacks.stream().forEach(childItem->{
+
+                            List<AssessmentFeedbacks> childFeedbacks = assessmentFeedbacksService.list(
+                                    new QueryWrapper<AssessmentFeedbacks>().eq("parent_id",childItem.assessmentFeedbackId));
+                          childItem.setChildFeedbacks(childFeedbacks);
+
+                        });
+                    }
+
                     item.setFeedbacks(assessmentFeedbacks);
                 });
             }

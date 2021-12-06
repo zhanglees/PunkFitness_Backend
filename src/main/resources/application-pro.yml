@@ -1,0 +1,23 @@
+server:
+  port: 443
+upload:
+    file-space: D:\wwwroot\resource
+spring:
+  #    国际化文件位置
+  messages.basename: i18n/message
+
+
+  datasource:
+
+    #driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/healthclubs?useSSL=false&serverTimezone=UTC
+    username: root
+    driverclassname: com.mysql.jdbc.Driver
+mybatis:
+  mapperLocations: classpath*:mapper/*.xml
+logging:
+  level.root:  com.healthclubs.pengke
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*Mapper.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

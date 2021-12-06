@@ -69,7 +69,7 @@ public class HealthCheckController extends BaseController{
         }
     }
 
-    //添加用户体检报告
+    //查看某次报告
     @ApiOperation(value = "/getHealthReportDetail", notes = "得到某一次的详细")
     @PostMapping(value = "/getHealthReportDetail")
     public Result getHealthReportDetail(String reportId) {
