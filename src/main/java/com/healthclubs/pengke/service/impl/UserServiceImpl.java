@@ -117,7 +117,7 @@ public class UserServiceImpl extends ServiceImpl<IUserMapper, UserInfo>
             }
 
             cacheService.add(data.session_key,userInfo,30, TimeUnit.MINUTES);
-            UserInfo temp = cacheService.getObject(data.session_key,UserInfo.class);
+            //UserInfo temp = cacheService.getObject(data.session_key,UserInfo.class);
 
             WiXiFormViewDto wiXiFormViewDto = new WiXiFormViewDto();
             wiXiFormViewDto.userId = userInfo.getId();

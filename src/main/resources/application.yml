@@ -1,5 +1,5 @@
 spring:
   profiles:
-    active: dev
+    active: pro
   mvc:
     date-format: yyyy-MM-dd HH:mm:ss

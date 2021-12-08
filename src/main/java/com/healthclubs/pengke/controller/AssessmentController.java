@@ -140,4 +140,12 @@ public class AssessmentController extends BaseController {
         }
     }
 
+    //增加用户评估
+    @ApiOperation(value = "/getTrainersAssessment", notes = "得到用户根据体检的列表")
+    @PostMapping(value = "/getTrainersAssessment")
+    public Result getTrainersAssessment(Integer assessmentType)
+    {
+        return  null;
+    }
+
 }
