@@ -48,6 +48,11 @@ public class UserServiceImpl extends ServiceImpl<IUserMapper, UserInfo>
     public RegisterDto register(RegisterDto usermodel) {
 
         try {
+            //默认准会员
+            if(usermodel.getCoustomLevel()==null)
+            {
+                usermodel.setCoustomLevel(0);
+            }
             baseMapper.insert(usermodel);
             StudentAndCoach _stuCoach = new StudentAndCoach();
             _stuCoach.setCoachId(usermodel.getTeacherId());
