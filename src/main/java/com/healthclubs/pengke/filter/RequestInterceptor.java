@@ -47,9 +47,9 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
       //  String sign = request.getHeader("version");
         String sessionKey = request.getHeader("sessionkey");
 
-        String authorization = request.getHeader("authorization");
-
-        if (timestamp == null || timestamp.isEmpty() || authorization == null || authorization.isEmpty()
+        //String authorization = request.getHeader("authorization");
+       //|| authorization == null || authorization.isEmpty()
+        if (timestamp == null || timestamp.isEmpty()
         ||sessionKey == null || sessionKey.isEmpty()) {
             Result result = new Result(1025, "请求头缺失.",null);
             getResponse(result, response);
@@ -75,7 +75,7 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
         userInfo = cacheService.getObject(sessionKey,UserInfo.class);
 
         //校验授权
-        String checkAuthor = timestamp +"&"+sessionKey+"&"+userInfo.getId();
+        /*String checkAuthor = timestamp +"&"+sessionKey+"&"+userInfo.getId();
 
         String keySecret = Has256.sign(checkAuthor,userInfo.getVersionKey());
 
@@ -84,7 +84,7 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
             Result result = new Result(1030, "验签错误.",null);
             getResponse(result, response);
             return false;
-        }
+        }*/
 
         Long requestTime = null;
         try {
