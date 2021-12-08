@@ -3,6 +3,7 @@ package com.healthclubs.pengke.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.healthclubs.pengke.entity.AssessmentContent;
 import com.healthclubs.pengke.entity.AssessmentFeedbacks;
+import com.healthclubs.pengke.entity.UserAssessmentListView;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
@@ -10,6 +11,7 @@ import com.healthclubs.pengke.pojo.dto.UserAssessmentDto;
 import com.healthclubs.pengke.service.IAssessmentContentService;
 import com.healthclubs.pengke.service.IAssessmentFeedbacksService;
 import com.healthclubs.pengke.service.IUserAssessmentFeedbackService;
+import com.healthclubs.pengke.service.IUserAssessmentListViewService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,9 @@ public class AssessmentController extends BaseController {
 
     @Autowired
     private IUserAssessmentFeedbackService userAssessmentFeedbackService;
+
+    @Autowired
+    private IUserAssessmentListViewService userAssessmentListViewService;
 
     //根据教练id得到评估测试内容
     @RequestMapping("/getAssessmentByCoachId")
@@ -140,12 +145,23 @@ public class AssessmentController extends BaseController {
         }
     }
 
-    //增加用户评估
-    @ApiOperation(value = "/getTrainersAssessment", notes = "得到用户根据体检的列表")
+    //评估用户列表
+    @ApiOperation(value = "/getTrainersAssessment", notes = "得到用户根据体检的列表,通过静态，动态，值")
     @PostMapping(value = "/getTrainersAssessment")
     public Result getTrainersAssessment(Integer assessmentType)
     {
-        return  null;
+        try {
+            List<UserAssessmentListView>  userAssessmentListViews =
+                    userAssessmentListViewService.list(new QueryWrapper<UserAssessmentListView>()
+                            .eq("assessment_type",assessmentType));
+            return getResult(ResponseCode.SUCCESS_PROCESSED,
+                    userAssessmentListViews);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package com.healthclubs.pengke.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -20,7 +21,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("userAssessmentList")
-public class UserAssessmentListView {
+public class UserAssessmentListView extends Model<UserAssessmentListView> {
 
     @TableField(value = "assessment_feedback_id")
     public String assessmentFeedbackId;
@@ -32,7 +33,6 @@ public class UserAssessmentListView {
     public String userName;
 
     public Date createTime;
-
 
 
 }
