@@ -42,4 +42,7 @@ public class UserAssessmentFeedback extends Model<UserAssessmentFeedback> {
     public Date createTime;
 
     public String coachRemark;
+
+    @TableField(exist = false)
+    public String assessmentId;
 }

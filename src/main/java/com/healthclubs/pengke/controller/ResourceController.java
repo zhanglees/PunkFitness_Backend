@@ -44,6 +44,7 @@ public class ResourceController extends BaseController{
         FileOutputStream outputStream = null;
         InputStream inputStream = null;
         String imageName = UUID.randomUUID().toString();
+        String fileDbId = imageName; //文件dbid
 
         try {
             if (files != null && files.length > 0) {
@@ -70,7 +71,7 @@ public class ResourceController extends BaseController{
                     IOUtils.copy(inputStream, outputStream);
                 }
             } else {
-                return getResult(1);
+                return getResult(ResponseCode.GENERIC_FAILURE);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,8 +83,7 @@ public class ResourceController extends BaseController{
         }
 
         //TODO这里你可以把图片地址保存到数据库等等
-
-        return getResult(ResponseCode.SUCCESS_PROCESSED);
+        return getResult(ResponseCode.SUCCESS_PROCESSED,fileDbId);
     }
 
 }

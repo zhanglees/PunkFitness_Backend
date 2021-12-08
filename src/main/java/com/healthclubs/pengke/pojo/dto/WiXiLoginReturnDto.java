@@ -48,7 +48,7 @@ public class WiXiLoginReturnDto {
 
     public String unionid;
 
-    public String errcode;
+    public String errcode = "0";
 
     public String errmsg;
 }

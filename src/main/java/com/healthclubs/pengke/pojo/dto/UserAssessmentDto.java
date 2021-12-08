@@ -27,4 +27,15 @@ public class UserAssessmentDto {
     }
 
     List<UserAssessmentResource> userAssessmentResources = new ArrayList<>();
+
+    public List<FlagRemark> getFlagRemarks() {
+        return flagRemarks;
+    }
+
+    public void setFlagRemarks(List<FlagRemark> flagRemarks) {
+        this.flagRemarks = flagRemarks;
+    }
+
+    public List<FlagRemark> flagRemarks;
+
 }

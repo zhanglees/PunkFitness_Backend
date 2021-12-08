@@ -1,6 +1,5 @@
 package com.healthclubs.pengke.entity;
 
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -26,14 +25,10 @@ import com.baomidou.mybatisplus.extension.activerecord.Model;
   ///      this.userName = userName;
    // }
 //}
-
-
 import com.baomidou.mybatisplus.annotation.IdType;
-
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.util.Date;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -114,6 +109,17 @@ public class UserInfo  extends Model<UserInfo>{
      * 学员级别
      */
     private  Integer coustomLevel;
+
+    /**
+     * 微信sessionkey
+     */
+    private String sessionKey;
+
+    /**
+     * 版本key
+     */
+    @TableField(value = "version_info")
+    private String versionKey;
 
     @Override
     protected Serializable pkVal() {

@@ -119,6 +119,14 @@ public class AssessmentController extends BaseController {
             userAssessmentDto.getUserAssessmentFeedbacks().stream().forEach(item->
             {
                 item.setUserAssessmentfeedbackId(UUID.randomUUID().toString());
+
+                userAssessmentDto.getFlagRemarks().stream().forEach(rebakItem->{
+                    if(rebakItem.assessmentId.equals(item.getAssessmentId()))
+                    {
+                        item.setCoachRemark(rebakItem.getRemark());
+                    }
+                });
+
             });
             userAssessmentFeedbackService.saveBatch(userAssessmentDto.getUserAssessmentFeedbacks());
 
