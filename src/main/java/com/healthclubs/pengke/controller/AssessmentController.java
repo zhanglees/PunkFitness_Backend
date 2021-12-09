@@ -56,16 +56,15 @@ public class AssessmentController extends BaseController {
                     List<AssessmentFeedbacks> assessmentFeedbacks = assessmentFeedbacksService.list(new
                             QueryWrapper<AssessmentFeedbacks>().eq(
                             "owner", coachId).or().eq("owner", "system").eq(
-                                    "assessment_id", item.assessmentId)
+                            "assessment_id", item.assessmentId)
                     );
 
-                    if(assessmentFeedbacks!=null && assessmentFeedbacks.size()>0)
-                    {
-                        assessmentFeedbacks.stream().forEach(childItem->{
+                    if (assessmentFeedbacks != null && assessmentFeedbacks.size() > 0) {
+                        assessmentFeedbacks.stream().forEach(childItem -> {
 
                             List<AssessmentFeedbacks> childFeedbacks = assessmentFeedbacksService.list(
-                                    new QueryWrapper<AssessmentFeedbacks>().eq("parent_id",childItem.assessmentFeedbackId));
-                          childItem.setChildFeedbacks(childFeedbacks);
+                                    new QueryWrapper<AssessmentFeedbacks>().eq("parent_id", childItem.assessmentFeedbackId));
+                            childItem.setChildFeedbacks(childFeedbacks);
 
                         });
                     }
@@ -121,13 +120,12 @@ public class AssessmentController extends BaseController {
                 return getResult(ResponseCode.GENERIC_FAILURE, userAssessmentDto);
             }
 
-            userAssessmentDto.getUserAssessmentFeedbacks().stream().forEach(item->
+            userAssessmentDto.getUserAssessmentFeedbacks().stream().forEach(item ->
             {
                 item.setUserAssessmentfeedbackId(UUID.randomUUID().toString());
 
-                userAssessmentDto.getFlagRemarks().stream().forEach(rebakItem->{
-                    if(rebakItem.assessmentId.equals(item.getAssessmentId()))
-                    {
+                userAssessmentDto.getFlagRemarks().stream().forEach(rebakItem -> {
+                    if (rebakItem.assessmentId.equals(item.getAssessmentId())) {
                         item.setCoachRemark(rebakItem.getRemark());
                     }
                 });
@@ -148,12 +146,11 @@ public class AssessmentController extends BaseController {
     //评估用户列表
     @ApiOperation(value = "/getTrainersAssessment", notes = "得到用户根据体检的列表,通过静态，动态，值")
     @PostMapping(value = "/getTrainersAssessment")
-    public Result getTrainersAssessment(Integer assessmentType)
-    {
+    public Result getTrainersAssessment(Integer assessmentType) {
         try {
-            List<UserAssessmentListView>  userAssessmentListViews =
+            List<UserAssessmentListView> userAssessmentListViews =
                     userAssessmentListViewService.list(new QueryWrapper<UserAssessmentListView>()
-                            .eq("assessment_type",assessmentType));
+                            .eq("assessment_type", assessmentType));
             return getResult(ResponseCode.SUCCESS_PROCESSED,
                     userAssessmentListViews);
         } catch (PengkeException e) {
@@ -162,6 +159,14 @@ public class AssessmentController extends BaseController {
             e.printStackTrace();
             return getResult(ResponseCode.GENERIC_FAILURE);
         }
+    }
+
+    //得到用户当时评估详细情况。
+    @ApiOperation(value = "/getUserAssessmentByRecord", notes = "得到用户根据体检的列表,通过静态，动态，值")
+    @PostMapping(value = "/getUserAssessmentByRecord")
+    public Result getUserAssessmentByRecord(@RequestBody UserAssessmentListView userAssessmentListView) {
+
+        return  null;
     }
 
 }
