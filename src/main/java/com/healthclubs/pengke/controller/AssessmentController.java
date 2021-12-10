@@ -84,6 +84,52 @@ public class AssessmentController extends BaseController {
 
     }
 
+    //根据教练id,评估类型得到内容
+    @RequestMapping("/getAssessmentByType")
+    public Result getAssessmentByType(String coachId,Integer assessmentType) {
+        try {
+
+            if (coachId == null || coachId.isEmpty()) {
+                return getResult(ResponseCode.USER_COACHId_EMPTY, coachId);
+            }
+
+            List<AssessmentContent> assessmentContents = assessmentContentService.list(
+                    new QueryWrapper<AssessmentContent>().eq("assessment_type",assessmentType));
+
+            if (assessmentContents != null && assessmentContents.size() > 0) {
+                assessmentContents.stream().forEach(item -> {
+                    List<AssessmentFeedbacks> assessmentFeedbacks = assessmentFeedbacksService.list(new
+                            QueryWrapper<AssessmentFeedbacks>().eq(
+                            "owner", coachId).or().eq("owner", "system").eq(
+                            "assessment_id", item.assessmentId)
+                    );
+
+                    if (assessmentFeedbacks != null && assessmentFeedbacks.size() > 0) {
+                        assessmentFeedbacks.stream().forEach(childItem -> {
+
+                            List<AssessmentFeedbacks> childFeedbacks = assessmentFeedbacksService.list(
+                                    new QueryWrapper<AssessmentFeedbacks>().eq("parent_id", childItem.assessmentFeedbackId));
+                            childItem.setChildFeedbacks(childFeedbacks);
+
+                        });
+                    }
+
+                    item.setFeedbacks(assessmentFeedbacks);
+                });
+            }
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,
+                    assessmentContents);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+
+    }
+
+
     //创建教练的反馈标签
     @ApiOperation(value = "/createNewFeedbacks", notes = "创建反馈标签")
     @PostMapping(value = "/createNewFeedbacks")
