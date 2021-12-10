@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.healthclubs.pengke.mapper.IUserAppointmentHistoryMapper">
+
+    <select id="getAppointMembersByDates"
+            resultType="com.healthclubs.pengke.entity.UserInfo">
+
+        select a.* from userinfo as a inner JOIN userappointment as b on
+        a.id = b.user_id  inner join
+        studentandcoach as c on
+        a.id = c.student_id
+        INNER JOIN userappointmenthistory as d
+        on b.appointment_id = d.appointment_id
+        where TO_DAYS(now()) -TO_DAYS(singin_time)   <![CDATA[ <= #{days} ]]> and c.coach_id = #{coachId}
+        and coustom_level = #{customLevel}
+        GROUP BY a.id
+     </select>
+</mapper>

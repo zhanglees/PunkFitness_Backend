@@ -37,4 +37,10 @@ public class UserAppointmentHistory extends Model<UserAppointmentHistory> {
 
     public Integer trainingType;
 
+    @TableField(exist = false)
+    public String userId;
+
+    @TableField(exist = false)
+    public String userName;
+
 }

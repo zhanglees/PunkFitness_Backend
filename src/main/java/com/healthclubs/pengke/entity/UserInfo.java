@@ -126,11 +126,17 @@ public class UserInfo  extends Model<UserInfo>{
         return null;
     }
 
+    //预约数
     @TableField(exist = false)
     private Integer appointmentNum;
 
+    //签课数
     @TableField(exist = false)
     private Integer singInNum;
+
+    //训练课总节数
+    @TableField(exist = false)
+    private Integer trainClassNumbers;
 }
 
 
