@@ -53,5 +53,6 @@ public class Question extends Model<Question> {
     @TableField(exist = false)
     private List<Questionitem> items;
 
+    public String showOrder;
 
 }

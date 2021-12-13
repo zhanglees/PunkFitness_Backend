@@ -1,9 +1,10 @@
 server:
   port: 8023
 upload:
-    file-space: D:\wwwroot\resource
+  file-space: D:\wwwroot\resource
 appsetings:
   version-key : 1.10.2
+  domain : 182.92.189.147
 spring:
   #    国际化文件位置
   messages.basename: i18n/message
