@@ -16,4 +16,9 @@ public class UserAnswerChoiceServiceImpl   extends ServiceImpl<IUserAnswerChoice
     public List<UserAnswerChoice> getUserQuestionList(String userId) {
         return baseMapper.getUserQuestionList(userId);
     }
+
+    @Override
+    public List<UserAnswerChoice> getUserQuestionListByType(String userId) {
+        return baseMapper.getUserQuestionListByType(userId);
+    }
 }

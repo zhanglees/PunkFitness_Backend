@@ -9,4 +9,6 @@ public interface IUserAnswerChoiceMapper extends BaseMapper<UserAnswerChoice> {
 
     public List<UserAnswerChoice> getUserQuestionList(String userId);
 
+    public List<UserAnswerChoice> getUserQuestionListByType(String userId);
+
 }

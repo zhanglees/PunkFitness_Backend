@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @Api("Questionnaire")
@@ -67,7 +68,6 @@ public class QuestionnaireController extends BaseController {
             return getResult(ResponseCode.GENERIC_FAILURE);
         }
     }
-
 
     @ApiOperation(value = "/getQuestionnaireAll", notes = "得到所有问卷")
     @RequestMapping(value = "/getQuestionnaireAll")
@@ -149,7 +149,6 @@ public class QuestionnaireController extends BaseController {
         }
     }
 
-
     @ApiOperation(value = "/saveUserQuestion", notes = "保存用户答案")
     @PostMapping(value = "/saveUserQuestion")
     public Result saveUserQuestion(@RequestBody List<UserAnswerChoice> userAnswerChoices) {
@@ -208,6 +207,43 @@ public class QuestionnaireController extends BaseController {
         }
     }
 
+    @ApiOperation(value = "/getUserQuestionListByType", notes = "根据用户分类得到问卷列表")
+    @RequestMapping(value = "/getUserQuestionListByType")
+    public Result getUserQuestionListByType(String coachId, String userId,Integer questionType) {
+        try {
+            // this.userAnswerChoiceService.list(new QueryWrapper<UserAnswerChoice>()
+            //         .eq("user_id",userId)
+            //        .groupBy("coach_id","record_time"));
+            List<UserQuestionDetailDto> userQuestionDetailDtos = new ArrayList<>();
+            List<UserAnswerChoice> userAnswerChoices = this.userAnswerChoiceService.getUserQuestionListByType(userId);
+
+            if(questionType!=null)
+            {
+                userAnswerChoices = userAnswerChoices.stream().filter(item->item.getQuestionType() ==
+                        questionType).collect(Collectors.toList());
+            }
+
+            if (userAnswerChoices != null && userAnswerChoices.size() > 0) {
+                userAnswerChoices.stream().forEach(item -> {
+                    UserQuestionDetailDto userQuestionDetailDto = new UserQuestionDetailDto();
+                    userQuestionDetailDto.setRecordTime(item.getRecordTime());
+                    userQuestionDetailDto.setCoachId(item.getCoachId());
+                    userQuestionDetailDto.setQuestionType(item.getQuestionType());
+                    userQuestionDetailDto.setUserId(item.getUserId());
+                    userQuestionDetailDto.setCoachName(item.getCoachName());
+                    userQuestionDetailDtos.add(userQuestionDetailDto);
+                });
+            }
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED, userQuestionDetailDtos);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
     @ApiOperation(value = "/getQuestionDetail", notes = "得到用户的问卷详细")
     @PostMapping(value = "/getQuestionDetail")
     public Result getQuestionDetail(UserQuestionDetailDto userQuestionDetailDto) {
@@ -227,5 +263,6 @@ public class QuestionnaireController extends BaseController {
             return getResult(ResponseCode.GENERIC_FAILURE);
         }
     }
+
 
 }

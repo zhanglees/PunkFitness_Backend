@@ -10,4 +10,14 @@ where a.user_id = #{userId}
 GROUP by a.coach_id,a.record_time
 
      </select>
+
+    <select id="getUserQuestionListByType"
+            resultType="com.healthclubs.pengke.entity.UserAnswerChoice">
+
+    select a.*,b.user_name as coach_Name from useranswerchoice as a LEFT JOIN userinfo as b  on a.coach_id = b.id
+where a.user_id = #{userId}
+GROUP by a.coach_id,a.record_time,a.question_type
+
+     </select>
+
 </mapper>
