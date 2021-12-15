@@ -8,6 +8,7 @@ import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
 import com.healthclubs.pengke.pojo.dto.UserQuestionDetailDto;
+import com.healthclubs.pengke.pojo.dto.UserQuestionViewDto;
 import com.healthclubs.pengke.service.IQuestionService;
 import com.healthclubs.pengke.service.IQuestionitemService;
 import com.healthclubs.pengke.service.IUserAnswerChoiceService;
@@ -209,7 +210,7 @@ public class QuestionnaireController extends BaseController {
 
     @ApiOperation(value = "/getUserQuestionListByType", notes = "根据用户分类得到问卷列表")
     @RequestMapping(value = "/getUserQuestionListByType")
-    public Result getUserQuestionListByType(String coachId, String userId,Integer questionType) {
+    public Result getUserQuestionListByType(String coachId, String userId, Integer type) {
         try {
             // this.userAnswerChoiceService.list(new QueryWrapper<UserAnswerChoice>()
             //         .eq("user_id",userId)
@@ -217,10 +218,9 @@ public class QuestionnaireController extends BaseController {
             List<UserQuestionDetailDto> userQuestionDetailDtos = new ArrayList<>();
             List<UserAnswerChoice> userAnswerChoices = this.userAnswerChoiceService.getUserQuestionListByType(userId);
 
-            if(questionType!=null)
-            {
-                userAnswerChoices = userAnswerChoices.stream().filter(item->item.getQuestionType() ==
-                        questionType).collect(Collectors.toList());
+            if (type != null) {
+                userAnswerChoices = userAnswerChoices.stream().filter(item -> item.getQuestionType() ==
+                        type).collect(Collectors.toList());
             }
 
             if (userAnswerChoices != null && userAnswerChoices.size() > 0) {
@@ -256,6 +256,117 @@ public class QuestionnaireController extends BaseController {
                             .eq("question_type", userQuestionDetailDto.questionType)
                     );
             return getResult(ResponseCode.SUCCESS_PROCESSED, allChoices);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
+    @ApiOperation(value = "/saveUserTemplateQuestion", notes = "根据模板保存用户选中")
+    @PostMapping(value = "/saveUserTemplateQuestion")
+    public Result saveUserTemplateQuestion(@RequestBody UserQuestionViewDto userQuestionViewDto) {
+        try {
+
+            if (userQuestionViewDto == null || userQuestionViewDto.getQuestions() == null) {
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userQuestionViewDto);
+            }
+
+            List<UserAnswerChoice> userAnswerChoices = new ArrayList<>();
+
+            String userId = userQuestionViewDto.getUserId();
+            String coachId = userQuestionViewDto.getCoachId();
+            Date currentDate = new Date();
+            Integer templateType0 = 0;//模板类型。0健身 1健康
+            Integer templatyType1 = 1;
+
+            userQuestionViewDto.getQuestions().stream().forEach(item -> {
+                item.getItems().stream().forEach(childItem -> {
+                    UserAnswerChoice tempData = new UserAnswerChoice();
+                    tempData.setUserId(userId);
+                    tempData.setCoachId(coachId);
+                    tempData.setRecordTime(currentDate);
+                    //优化。
+                    if (item.getQuestionTemplateId().equals("EDC0C14B-D8C9-4DB7-AFA7-0004B5BAC077")) {
+                        tempData.setQuestionType(templateType0);
+                    } else {
+                        tempData.setQuestionType(templatyType1);
+                    }
+                    tempData.setQuestionItemId(childItem.getQuestionItemId());
+                    tempData.setItemExplain(item.getItemExplain());
+                    userAnswerChoices.add(tempData);
+                });
+            });
+
+            if (userAnswerChoices.size() > 0) {
+                this.userAnswerChoiceService.saveBatch(userAnswerChoices);
+            }
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
+
+    @ApiOperation(value = "/getUserTemplateQuestionDetail", notes = "得到用户的问卷详细")
+    @PostMapping(value = "/getUserTemplateQuestionDetail")
+    public Result getUserTemplateQuestionDetail(UserQuestionDetailDto userQuestionDetailDto) {
+        try {
+
+            List<String> questionItemids =
+                    this.userAnswerChoiceService.list(new QueryWrapper<UserAnswerChoice>()
+                            .eq("user_id", userQuestionDetailDto.userId)
+                            .eq("coach_id", userQuestionDetailDto.coachId)
+                            .eq("record_time", userQuestionDetailDto.recordTime)
+                            .eq("question_type", userQuestionDetailDto.questionType)
+                    ).stream().map(UserAnswerChoice::getQuestionItemId)
+                            .collect(Collectors.toList());
+
+            List<Questionitem> questionitemsitems = this.questionitemService.list(new QueryWrapper<Questionitem>().
+                    in("question_item_id", questionItemids));
+
+
+            List<UserAnswerChoice> questionsData = this.userAnswerChoiceService.
+                    getUserQuestionExplain(userQuestionDetailDto.userId).stream().filter(item -> {
+                if (item.getRecordTime().equals(userQuestionDetailDto.recordTime) &&
+                        item.getQuestionType().equals(userQuestionDetailDto.questionType)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }).collect(Collectors.toList());
+
+            List<Question> questions = this.questionService.list();
+            questions.stream().forEach(item -> {
+                item.setItems(questionitemsitems.stream().filter(childitem -> {
+                    if (childitem.getQustionId().equals(item.getQuestionId())) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }).collect(Collectors.toList()));
+
+                questionsData.stream().forEach(questionItem -> {
+                    if (questionItem.getQustionId().equals(item.getQuestionId())) {
+                        item.setItemExplain(questionItem.getItemExplain());
+                    }
+                });
+
+            });
+
+            UserQuestionViewDto userQuestionViewDto = new UserQuestionViewDto();
+            userQuestionViewDto.setUserId(userQuestionDetailDto.userId);
+            userQuestionViewDto.setCreateTime(userQuestionDetailDto.recordTime);
+            userQuestionViewDto.setCoachId(userQuestionDetailDto.coachId);
+            userQuestionViewDto.setQuestions(questions);
+
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED, userQuestionViewDto);
         } catch (PengkeException e) {
             return getResult(e.getCode());
         } catch (Exception e) {

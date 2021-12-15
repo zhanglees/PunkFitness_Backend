@@ -20,4 +20,15 @@ GROUP by a.coach_id,a.record_time,a.question_type
 
      </select>
 
+    <select id="getUserQuestionExplain"
+            resultType="com.healthclubs.pengke.entity.UserAnswerChoice">
+
+    select a.*,c.qustion_id,b.user_name as coach_Name from useranswerchoice as a LEFT JOIN userinfo as b  on a.coach_id = b.id
+INNER JOIN questionitem as c on c.question_item_id = a.question_item_id
+where a.user_id = #{userId}
+GROUP by a.coach_id,a.record_time,a.question_type,c.qustion_id
+
+     </select>
+
+
 </mapper>

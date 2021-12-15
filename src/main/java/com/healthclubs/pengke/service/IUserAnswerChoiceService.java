@@ -10,4 +10,6 @@ public interface IUserAnswerChoiceService extends IService<UserAnswerChoice> {
     public List<UserAnswerChoice> getUserQuestionList(String userId);
 
     public List<UserAnswerChoice> getUserQuestionListByType(String userId);
+
+    public List<UserAnswerChoice> getUserQuestionExplain(String userId);
 }

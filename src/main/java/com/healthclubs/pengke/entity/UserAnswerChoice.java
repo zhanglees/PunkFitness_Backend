@@ -34,4 +34,7 @@ public class UserAnswerChoice extends Model<UserAnswerChoice> {
     //问卷的补充说明
     public String itemExplain;
 
+    @TableField(exist = false)
+    public String qustionId;
+
 }

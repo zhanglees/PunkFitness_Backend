@@ -55,4 +55,7 @@ public class Question extends Model<Question> {
 
     public String showOrder;
 
+    @TableField(exist = false)
+    private String itemExplain;
+
 }
