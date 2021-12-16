@@ -102,6 +102,7 @@ public class AssessmentController extends BaseController {
                             QueryWrapper<AssessmentFeedbacks>().eq(
                             "owner", coachId).or().eq("owner", "system").eq(
                             "assessment_id", item.assessmentId)
+                           .isNull("parent_id").orderByAsc("show_Order")
                     );
 
                     if (assessmentFeedbacks != null && assessmentFeedbacks.size() > 0) {

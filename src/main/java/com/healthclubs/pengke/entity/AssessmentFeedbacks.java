@@ -44,4 +44,6 @@ public class AssessmentFeedbacks extends Model<AssessmentFeedbacks> {
 
     @TableField(exist = false)
     public List<AssessmentFeedbacks> childFeedbacks = new ArrayList<>();
+
+    public String itemUnit;
 }
