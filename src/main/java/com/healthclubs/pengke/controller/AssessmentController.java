@@ -86,7 +86,7 @@ public class AssessmentController extends BaseController {
 
     //根据教练id,评估类型得到内容
     @RequestMapping("/getAssessmentByType")
-    public Result getAssessmentByType(String coachId,Integer assessmentType) {
+    public Result getAssessmentByType(String coachId, Integer assessmentType) {
         try {
 
             if (coachId == null || coachId.isEmpty()) {
@@ -94,7 +94,7 @@ public class AssessmentController extends BaseController {
             }
 
             List<AssessmentContent> assessmentContents = assessmentContentService.list(
-                    new QueryWrapper<AssessmentContent>().eq("assessment_type",assessmentType));
+                    new QueryWrapper<AssessmentContent>().eq("assessment_type", assessmentType));
 
             if (assessmentContents != null && assessmentContents.size() > 0) {
                 assessmentContents.stream().forEach(item -> {
@@ -208,11 +208,27 @@ public class AssessmentController extends BaseController {
     }
 
     //得到用户当时评估详细情况。
-    @ApiOperation(value = "/getUserAssessmentByRecord", notes = "得到用户根据体检的列表,通过静态，动态，值")
-    @PostMapping(value = "/getUserAssessmentByRecord")
-    public Result getUserAssessmentByRecord(@RequestBody UserAssessmentListView userAssessmentListView) {
+    @ApiOperation(value = "/getTrainerAssessmentByRecord", notes = "得到用户评估列表根据分类")
+    @PostMapping(value = "/getTrainerAssessmentByRecord")
+    public Result getTrainerAssessmentByRecord(@RequestBody UserAssessmentListView userAssessmentListView) {
 
-        return  null;
+        if (userAssessmentListView == null) {
+            return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userAssessmentListView);
+        }
+
+        try {
+            List<UserAssessmentListView> userAssessmentListViews =
+                    userAssessmentListViewService.list(new QueryWrapper<UserAssessmentListView>()
+                            .eq("assessment_type", userAssessmentListView.getAssessmentType())
+                            .eq("user_id", userAssessmentListView.getUserId()));
+            return getResult(ResponseCode.SUCCESS_PROCESSED,
+                    userAssessmentListViews);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
     }
 
 }

@@ -341,7 +341,22 @@ public class QuestionnaireController extends BaseController {
                 }
             }).collect(Collectors.toList());
 
-            List<Question> questions = this.questionService.list();
+            List<Question> questions = new ArrayList<>();
+            if(userQuestionDetailDto.questionType.equals(0))
+            {
+                //有问题 优化！！！
+                questions = this.questionService.list(new QueryWrapper<Question>()
+                        .eq("question_template_id","EDC0C14B-D8C9-4DB7-AFA7-0004B5BAC077"));
+            }
+            else
+            {
+                //有问题 优化！！！
+                questions = this.questionService.list(new QueryWrapper<Question>()
+                        .eq("question_template_id","ce5078ff-ad07-103a-a787-e7e4c0162da0"));
+            }
+
+
+
             questions.stream().forEach(item -> {
                 item.setItems(questionitemsitems.stream().filter(childitem -> {
                     if (childitem.getQustionId().equals(item.getQuestionId())) {
