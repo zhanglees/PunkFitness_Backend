@@ -1,10 +1,13 @@
 package com.healthclubs.pengke.controller;
 
+import com.healthclubs.pengke.entity.ResourceInfo;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
+import com.healthclubs.pengke.service.IResourceInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,17 +19,22 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.UUID;
 
 @RestController
 @Api("resource")
 @RequestMapping("/api/resource")
-public class ResourceController extends BaseController{
+public class ResourceController extends BaseController {
 
-    /** 文件上传父目录 */
+    /**
+     * 文件上传父目录
+     */
     @Value("${upload.file-space}")
     private String fileSpace;
 
+    @Autowired
+    private IResourceInfoService resourceInfoService;
 
     //创建自定义标签
     @ApiOperation(value = "/uploadFile", notes = "上传文件")
@@ -34,10 +42,17 @@ public class ResourceController extends BaseController{
     @Transactional
     public Result uploadFile(String userId, MultipartFile[] files) throws IOException {
 
-       // String token = redisTemplate.opsForValue().get(USER_REDIS_SESSION + ":" + userId);
-      //  if (StringUtils.isEmpty(token) || StringUtils.isEmpty(userId)) {
-       //     return ResponseVo.error("用户id不能为空");
-       // }
+        // String token = redisTemplate.opsForValue().get(USER_REDIS_SESSION + ":" + userId);
+        //  if (StringUtils.isEmpty(token) || StringUtils.isEmpty(userId)) {
+        //     return ResponseVo.error("用户id不能为空");
+        // }
+
+
+        if(userId==null || userId.isEmpty())
+        {
+            return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY,userId);
+        }
+
         //数据库相对路径
         String uploadPathDB = "/" + userId + "/face";
 
@@ -59,6 +74,7 @@ public class ResourceController extends BaseController{
                     //数据库保存路径
                     uploadPathDB += ("/" + fileName);
 
+
                     File file = new File(filePathFace);
                     if (file.getParentFile() != null || file.getParentFile().isDirectory()) {
                         //创建父文件夹
@@ -69,12 +85,21 @@ public class ResourceController extends BaseController{
                     inputStream = files[0].getInputStream();
 
                     IOUtils.copy(inputStream, outputStream);
+
+                    ResourceInfo resource = new ResourceInfo();
+                    resource.setResourceId(fileDbId);
+                    resource.setResourcePath(filePathFace);
+                    resource.setOwner(userId);
+
+                    resource.setCreateTime(new Date());
+                    resourceInfoService.save(resource);
                 }
             } else {
-                return getResult(ResponseCode.GENERIC_FAILURE);
+                return getResult(ResponseCode.GENERIC_FAILURE,"files not empty");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE, e.getMessage());
         } finally {
             if (inputStream != null) {
                 outputStream.flush();
@@ -83,7 +108,7 @@ public class ResourceController extends BaseController{
         }
 
         //TODO这里你可以把图片地址保存到数据库等等
-        return getResult(ResponseCode.SUCCESS_PROCESSED,fileDbId);
+        return getResult(ResponseCode.SUCCESS_PROCESSED, fileDbId);
     }
 
 }

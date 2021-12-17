@@ -284,9 +284,12 @@ public class AssessmentController extends BaseController {
                     .map(UserAssessmentFeedback::getAssessmentFeedbackId).collect(Collectors.toList());
 
            Map<String,String> userSelectMap = new HashMap<String,String>();
+           Map<String,String> userSelectMapRemark = new HashMap<String,String>();
             userAssessmentFeedbacks.stream().forEach(item->{
                 userSelectMap.put(item.getAssessmentFeedbackId(),item.getAssessmentFeedbackValue());
+                userSelectMapRemark.put(item.getAssessmentFeedbackId(),item.getCoachRemark());
             });
+
 
             //优化。 daniel
             if (assessmentContents != null && assessmentContents.size() > 0) {
@@ -309,6 +312,12 @@ public class AssessmentController extends BaseController {
                                             new QueryWrapper<AssessmentFeedbacks>().eq("parent_id", childItem.assessmentFeedbackId)
                                                     .in("assessment_feedback_id",userAssessmentFeedbackIds));
                                     childItem.setChildFeedbacks(childFeedbacks);
+
+                                    if(childFeedbacks!=null && childFeedbacks.size()>0)
+                                    {
+                                        String remark = userSelectMapRemark.get(childFeedbacks.get(0).getAssessmentFeedbackId());
+                                        item.setCoachRemark(remark);
+                                    }
                                 });
                             }
                             break;
@@ -319,6 +328,12 @@ public class AssessmentController extends BaseController {
                                     "assessment_id", item.assessmentId)
                                     .in("assessment_feedback_id",userAssessmentFeedbackIds).orderByAsc("show_Order")
                             );
+
+                            if(assessmentFeedbacks!=null && assessmentFeedbacks.size()>0)
+                            {
+                                String remark = userSelectMapRemark.get(assessmentFeedbacks.get(0).getAssessmentFeedbackId());
+                                item.setCoachRemark(remark);
+                            }
                             break;
                         case 2:
 
@@ -334,6 +349,9 @@ public class AssessmentController extends BaseController {
                                       selectResult.setItemValue(userSelectMap.get(selectResult.getAssessmentFeedbackId()));
                                   }
                                 });
+
+                                String remark = userSelectMapRemark.get(assessmentFeedbacks.get(0).getAssessmentFeedbackId());
+                                item.setCoachRemark(remark);
                             }
                     }
 

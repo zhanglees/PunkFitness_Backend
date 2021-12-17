@@ -46,4 +46,7 @@ public class AssessmentContent extends Model<AssessmentContent> {
     @TableField(exist = false)
     UserAssessmentResource currentUserResource;
 
+    @TableField(exist = false)
+    String coachRemark;
+
 }
