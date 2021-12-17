@@ -1,17 +1,12 @@
 package com.healthclubs.pengke.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.healthclubs.pengke.entity.AssessmentContent;
-import com.healthclubs.pengke.entity.AssessmentFeedbacks;
-import com.healthclubs.pengke.entity.UserAssessmentListView;
+import com.healthclubs.pengke.entity.*;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
 import com.healthclubs.pengke.pojo.dto.UserAssessmentDto;
-import com.healthclubs.pengke.service.IAssessmentContentService;
-import com.healthclubs.pengke.service.IAssessmentFeedbacksService;
-import com.healthclubs.pengke.service.IUserAssessmentFeedbackService;
-import com.healthclubs.pengke.service.IUserAssessmentListViewService;
+import com.healthclubs.pengke.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @Api("assessment")
@@ -39,6 +34,12 @@ public class AssessmentController extends BaseController {
 
     @Autowired
     private IUserAssessmentListViewService userAssessmentListViewService;
+
+    @Autowired
+    private IUserAssessmentResourceService userAssessmentResourceService;
+
+    @Autowired
+    private IResourceInfoService resourceInfoService;
 
     //根据教练id得到评估测试内容
     @RequestMapping("/getAssessmentByCoachId")
@@ -94,7 +95,10 @@ public class AssessmentController extends BaseController {
             }
 
             List<AssessmentContent> assessmentContents = assessmentContentService.list(
-                    new QueryWrapper<AssessmentContent>().eq("assessment_type", assessmentType));
+                    new QueryWrapper<AssessmentContent>()
+                            .eq("assessment_type", assessmentType)
+                            .orderByAsc("show_order")
+            );
 
             if (assessmentContents != null && assessmentContents.size() > 0) {
                 assessmentContents.stream().forEach(item -> {
@@ -167,9 +171,13 @@ public class AssessmentController extends BaseController {
                 return getResult(ResponseCode.GENERIC_FAILURE, userAssessmentDto);
             }
 
+            Date currentTime = new Date();
+
             userAssessmentDto.getUserAssessmentFeedbacks().stream().forEach(item ->
             {
                 item.setUserAssessmentfeedbackId(UUID.randomUUID().toString());
+
+                item.setCreateTime(currentTime);
 
                 userAssessmentDto.getFlagRemarks().stream().forEach(rebakItem -> {
                     if (rebakItem.assessmentId.equals(item.getAssessmentId())) {
@@ -179,6 +187,21 @@ public class AssessmentController extends BaseController {
 
             });
             userAssessmentFeedbackService.saveBatch(userAssessmentDto.getUserAssessmentFeedbacks());
+
+            List<UserAssessmentResource> resources = userAssessmentDto.getUserAssessmentResources();
+
+            if(resources!=null && resources.size()>0)
+            {
+               resources.stream().forEach(item->{
+                   item.setUserAssessmentresourceId(UUID.randomUUID().toString());
+
+                   item.setCreateTime(currentTime);
+               });
+            }
+
+            //Save recource
+            userAssessmentResourceService.saveBatch(userAssessmentDto.getUserAssessmentResources());
+
 
             return getResult(ResponseCode.SUCCESS_PROCESSED,
                     userAssessmentDto);
@@ -198,6 +221,7 @@ public class AssessmentController extends BaseController {
             List<UserAssessmentListView> userAssessmentListViews =
                     userAssessmentListViewService.list(new QueryWrapper<UserAssessmentListView>()
                             .eq("assessment_type", assessmentType));
+
             return getResult(ResponseCode.SUCCESS_PROCESSED,
                     userAssessmentListViews);
         } catch (PengkeException e) {
@@ -224,6 +248,121 @@ public class AssessmentController extends BaseController {
                             .eq("user_id", userAssessmentListView.getUserId()));
             return getResult(ResponseCode.SUCCESS_PROCESSED,
                     userAssessmentListViews);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
+
+    //得到用户评估细节。
+    @ApiOperation(value = "/getTrainerAssessmentDetail", notes = "得到用户评估细节")
+    @PostMapping(value = "/getTrainerAssessmentDetail")
+    public Result getTrainerAssessmentDetail(@RequestBody UserAssessmentListView userAssessmentListView) {
+
+        if (userAssessmentListView == null) {
+            return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userAssessmentListView);
+        }
+
+        try {
+            List<AssessmentContent> assessmentContents = assessmentContentService.list(
+                    new QueryWrapper<AssessmentContent>()
+                            .eq("assessment_type", userAssessmentListView.getAssessmentType())
+                            .orderByAsc("show_order")
+            );
+
+            //用户保存的。
+            List<UserAssessmentFeedback> userAssessmentFeedbacks = new ArrayList<>();
+            userAssessmentFeedbacks = this.userAssessmentFeedbackService.list(new QueryWrapper<UserAssessmentFeedback>()
+                    .eq("user_id",userAssessmentListView.getUserId())
+                    .eq("coach_id",userAssessmentListView.getCoachId())
+                    .eq("create_time",userAssessmentListView.getCreateTime()));
+
+            List<String> userAssessmentFeedbackIds = userAssessmentFeedbacks.stream()
+                    .map(UserAssessmentFeedback::getAssessmentFeedbackId).collect(Collectors.toList());
+
+           Map<String,String> userSelectMap = new HashMap<String,String>();
+            userAssessmentFeedbacks.stream().forEach(item->{
+                userSelectMap.put(item.getAssessmentFeedbackId(),item.getAssessmentFeedbackValue());
+            });
+
+            //优化。 daniel
+            if (assessmentContents != null && assessmentContents.size() > 0) {
+                assessmentContents.stream().forEach(item -> {
+                    //添加选择
+                    List<AssessmentFeedbacks> assessmentFeedbacks = new ArrayList<>();
+
+                    switch (userAssessmentListView.getAssessmentType())
+                    {
+                        case 0:
+                            assessmentFeedbacks = assessmentFeedbacksService.list(new
+                                    QueryWrapper<AssessmentFeedbacks>().eq(
+                                    "owner", userAssessmentListView.getCoachId()).or().eq("owner", "system").eq(
+                                    "assessment_id", item.assessmentId)
+                                    .isNull("parent_id").orderByAsc("show_Order")
+                            );
+                            if (assessmentFeedbacks != null && assessmentFeedbacks.size() > 0) {
+                                assessmentFeedbacks.stream().forEach(childItem -> {
+                                    List<AssessmentFeedbacks> childFeedbacks = assessmentFeedbacksService.list(
+                                            new QueryWrapper<AssessmentFeedbacks>().eq("parent_id", childItem.assessmentFeedbackId)
+                                                    .in("assessment_feedback_id",userAssessmentFeedbackIds));
+                                    childItem.setChildFeedbacks(childFeedbacks);
+                                });
+                            }
+                            break;
+                        case 1:
+                            assessmentFeedbacks = assessmentFeedbacksService.list(new
+                                    QueryWrapper<AssessmentFeedbacks>().eq(
+                                    "owner", userAssessmentListView.getCoachId()).or().eq("owner", "system").eq(
+                                    "assessment_id", item.assessmentId)
+                                    .in("assessment_feedback_id",userAssessmentFeedbackIds).orderByAsc("show_Order")
+                            );
+                            break;
+                        case 2:
+
+                            assessmentFeedbacks = assessmentFeedbacksService.list(new
+                                    QueryWrapper<AssessmentFeedbacks>().eq(
+                                    "owner", userAssessmentListView.getCoachId()).or().eq("owner", "system").eq(
+                                    "assessment_id", item.assessmentId)
+                                    .in("assessment_feedback_id",userAssessmentFeedbackIds).orderByAsc("show_Order"));
+                            if(assessmentFeedbacks!=null && assessmentFeedbacks.size()>0)
+                            {
+                                assessmentFeedbacks.stream().forEach(selectResult->{
+                                  if(userSelectMap.containsKey(selectResult.getAssessmentFeedbackId()))                               {
+                                      selectResult.setItemValue(userSelectMap.get(selectResult.getAssessmentFeedbackId()));
+                                  }
+                                });
+                            }
+                    }
+
+                    item.setFeedbacks(assessmentFeedbacks);
+
+                    List<UserAssessmentResource> resources = userAssessmentResourceService.list(new QueryWrapper<UserAssessmentResource>()
+                            .eq("user_id",userAssessmentListView.getUserId())
+                            .eq("coach_id",userAssessmentListView.getCoachId())
+                            .eq("assessment_id",item.getAssessmentId())
+                            .eq("create_time",userAssessmentListView.getCreateTime()));
+                    if(resources!=null && resources.size()>0)
+                    {
+
+                        UserAssessmentResource userAssessmentResource = resources.get(0);
+                        ResourceInfo resourceInfo = resourceInfoService.getById(userAssessmentResource.getResourceId());
+                        if(resourceInfo!=null)
+                        {
+                            userAssessmentResource.setResourceUrl(resourceInfo.resourcePath);
+                        }
+
+                        item.setCurrentUserResource(resources.get(0));
+                    }
+
+                });
+            }
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,
+                    assessmentContents);
+
         } catch (PengkeException e) {
             return getResult(e.getCode());
         } catch (Exception e) {

@@ -37,8 +37,13 @@ public class AssessmentContent extends Model<AssessmentContent> {
      */
     public Integer assessmentType;
 
+    //暂时不用显示
+    //public Integer showOrder;
+
     @TableField(exist = false)
     List<AssessmentFeedbacks> feedbacks;
 
+    @TableField(exist = false)
+    UserAssessmentResource currentUserResource;
 
 }
