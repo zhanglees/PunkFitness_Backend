@@ -49,7 +49,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-
+//开通验证注销掉upi 打开api
         registry.addInterceptor(getSessionInterceptor())
                 .addPathPatterns("/upi/**")
                 //.addPathPatterns("/api/**")

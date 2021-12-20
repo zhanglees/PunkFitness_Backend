@@ -50,4 +50,66 @@ public class UserhealthcheckReport extends Model<UserhealthcheckReport> {
 
     public Date createTime;
 
+    /**
+     * 脂肪量
+     */
+    public Float fatContent;
+
+    /**
+     * 水分
+     */
+    public Float waterContent;
+
+    /**
+     * 骨骼肌
+     */
+    public Float skeletalMuscle;
+
+    /**
+     * 肌肉量
+     */
+    public Float muscleMass;
+
+    /**
+     * 腰臀比
+     */
+    public Float waistHipRatio;
+
+    /**
+     * 臀围
+     */
+    public Float hipline;
+
+    /**
+     * 左上臂围
+     */
+    public Float leftArmCircumference;
+
+    /**
+     * 右上臂围
+     */
+    public Float rightArmCircumference;
+
+    /**
+     * 左大腿围
+     */
+    public Float leftThighCircumference;
+
+    /**
+     * 右大腿围
+     */
+    public Float rightThighCircumference;
+
+    /**
+     * 左小腿围
+     */
+    public Float leftShankCircumference;
+
+    /**
+     * 右小腿围
+     */
+    public Float rightShankCircumference;
+
+    @TableField(exist = false)
+    private String  coachName;
 }
