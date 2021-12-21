@@ -136,14 +136,38 @@ public class HealthCheckController extends BaseController {
             if (userhealthcheckResources != null && userhealthcheckResources.size() > 0) {
                 userhealthcheckResource = userhealthcheckResources.get(0);
 
-                String itemRight = resourceInfoService.getById(userhealthcheckResource.getItemRightPath()).getResourcePath();
-                String itemLeft = resourceInfoService.getById(userhealthcheckResource.getItemLeftPath()).getResourcePath();
-                String itemAhead = resourceInfoService.getById(userhealthcheckResource.getItemAheadPath()).getResourcePath();
-                String itemBack = resourceInfoService.getById(userhealthcheckResource.getItemBackPath()).getResourcePath();
-                userhealthcheckResource.setItemAheadPath(itemAhead);
-                userhealthcheckResource.setItemBackPath(itemBack);
-                userhealthcheckResource.setItemRightPath(itemRight);
-                userhealthcheckResource.setItemLeftPath(itemLeft);
+                if(resourceInfoService.getById(userhealthcheckResource.getItemRightPath())!=null)
+                {
+                    String itemRight =resourceInfoService.getById(userhealthcheckResource.getItemRightPath()).getResourcePath();
+                    userhealthcheckResource.setItemRightPath(itemRight);
+                }
+
+                if(resourceInfoService.getById(userhealthcheckResource.getItemLeftPath())!=null)
+                {
+                    String itemLeft = resourceInfoService.getById(userhealthcheckResource.getItemLeftPath()).getResourcePath();
+                    userhealthcheckResource.setItemLeftPath(itemLeft);
+                }
+
+                if(resourceInfoService.getById(userhealthcheckResource.getItemAheadPath())!=null)
+                {
+                    String itemAhead = resourceInfoService.getById(userhealthcheckResource.getItemAheadPath()).getResourcePath();
+                    userhealthcheckResource.setItemAheadPath(itemAhead);
+                }
+
+                if(resourceInfoService.getById(userhealthcheckResource.getItemBackPath())!=null)
+                {
+                    String itemBack = resourceInfoService.getById(userhealthcheckResource.getItemBackPath()).getResourcePath();
+                    userhealthcheckResource.setItemBackPath(itemBack);
+                }
+
+
+
+                if(resourceInfoService.getById(userhealthcheckResource.getHealthReportPath())!=null)
+                {
+                    String reportUrl = resourceInfoService.getById(userhealthcheckResource.getHealthReportPath()).getResourcePath();
+                    userhealthcheckResource.setHealthReportPath(reportUrl);
+                }
+
 
                 userHealthCheckDto.setUserhealthcheckResource(userhealthcheckResource);
             }

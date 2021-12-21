@@ -38,4 +38,6 @@ public class UserhealthcheckResource {
 
     public String itemAheadPath;
 
+    public String healthReportPath;
+
 }

@@ -1,6 +1,5 @@
 package com.healthclubs.pengke.entity;
 
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -9,9 +8,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
+import java.util.List;
+
 /**
  * <p>
- *课程信息
+ *训练课程信息
  * </p>
  *
  * @author daniel.tz
@@ -39,4 +41,21 @@ public class ClassInfo extends Model<ClassInfo> {
      */
     public Integer trainingType;
 
+    /**
+     * 所有者 教练id
+     */
+    public String ownerId;
+
+    /**
+     * 是否显示
+     */
+    public Integer isShow;
+
+    /**
+     * 创建时间
+     */
+    public Date createTime;
+
+    @TableField(exist = false)
+    public List<ClassContent> classContents;
 }
