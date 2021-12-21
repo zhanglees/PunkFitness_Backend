@@ -12,7 +12,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +37,12 @@ public class TrainPlanController extends BaseController {
     @Autowired
     IUserTrainplanClassContentService userTrainplanClassContentService;
 
+    @Autowired
+    IUsertrainPlanSectionService usertrainPlanSectionService;
+
+    @Autowired
+    IUserTraionSectionDetailService userTraionSectionDetailService;
+
 
     //得到训练计划续联课内容
     @ApiOperation(value = "/getTrainClassByCoachId", notes = "得到教练下得课程")
@@ -56,8 +61,9 @@ public class TrainPlanController extends BaseController {
 
                 classInfos.stream().forEach(item -> {
                     List<ClassContent> classContents = classContentService.list(new QueryWrapper<ClassContent>()
-                            .eq("train_class_id", item.getClassId())
-                            .eq("owner", coachId).or().eq("owner", "system"));
+
+                            .eq("owner", coachId).or().eq("owner", "system")
+                            .eq("train_class_id", item.getClassId()));
                     if (classContents != null && classContents.size() > 0) {
                         item.setClassContents(classContents);
                     }
@@ -199,6 +205,48 @@ public class TrainPlanController extends BaseController {
         }
     }
 
+
+    //创建训练课小节规划
+    @ApiOperation(value = "/addUserTrainClassSection", notes = "创建训练课小节规划")
+    @PostMapping(value = "/addUserTrainClassSection")
+    public Result AddUserTrainClassSection(@RequestBody UsertrainPlanSection usertrainPlanSection)
+    {
+        try {
+
+            if (usertrainPlanSection == null || usertrainPlanSection.getCoachId()== null ||
+                    usertrainPlanSection.getCoachId().isEmpty() || usertrainPlanSection.getUserId() == null ||
+                    usertrainPlanSection.getUserId().isEmpty()) {
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, usertrainPlanSection);
+            }
+
+            String userTrainingPlanSectionId = UUID.randomUUID().toString();
+            String userId = usertrainPlanSection.getUserId();
+            String coachId = usertrainPlanSection.getCoachId();
+
+            usertrainPlanSection.setUsertrainSectionId(userTrainingPlanSectionId);
+            usertrainPlanSection.setCreateTime(new Date());
+            usertrainPlanSectionService.save(usertrainPlanSection);
+
+            List<UserTraionSectionDetail> details = usertrainPlanSection.getUserTraionSectionDetails();
+
+            if(details!=null && details.size()>0){
+                details.stream().forEach(item->{
+                    item.setSectionDetailId(UUID.randomUUID().toString());
+                    item.setUsertrainSectionId(userTrainingPlanSectionId);
+                    item.setUserId(userId);
+                    item.setCoachId(coachId);
+                });
+            }
+            userTraionSectionDetailService.saveBatch(details);
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED, usertrainPlanSection);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
 
 
 }
