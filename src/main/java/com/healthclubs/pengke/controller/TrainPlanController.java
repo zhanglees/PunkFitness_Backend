@@ -6,7 +6,6 @@ import com.healthclubs.pengke.entity.*;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
-import com.healthclubs.pengke.pojo.dto.AppointmentDto;
 import com.healthclubs.pengke.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -154,6 +153,9 @@ public class TrainPlanController extends BaseController {
             }
 
             String userTrainingPlanid = UUID.randomUUID().toString();
+            String userId = userTrainingPlan.getUserId();
+            String coachId = userTrainingPlan.getCoachId();
+
             userTrainingPlan.setTrainingPlanId(userTrainingPlanid);
             userTrainingPlanService.save(userTrainingPlan);
 
@@ -165,6 +167,8 @@ public class TrainPlanController extends BaseController {
                    item.setUserTrainitemId(UUID.randomUUID().toString());
                    //设置训练计划id
                    item.setTrainingPlanId(userTrainingPlanid);
+                   item.setUserId(userId);
+                   item.setCoachId(coachId);
 
                    List<UserTrainplanClassContent> userTrainplanClassContents = item.getUserTrainplanClassContents();
 
@@ -174,6 +178,8 @@ public class TrainPlanController extends BaseController {
                        {
                            childitem.setUserClasscontentId(UUID.randomUUID().toString());
                            childitem.setTrainingPlanId(userTrainingPlanid);
+                           childitem.setUserId(userId);
+                           childitem.setCoachId(coachId);
                        });
 
                        //设置训练计划id
