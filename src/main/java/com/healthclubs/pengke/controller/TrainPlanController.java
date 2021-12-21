@@ -2,19 +2,18 @@ package com.healthclubs.pengke.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.healthclubs.pengke.entity.ClassContent;
-import com.healthclubs.pengke.entity.ClassInfo;
+import com.healthclubs.pengke.entity.*;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
 import com.healthclubs.pengke.pojo.dto.AppointmentDto;
-import com.healthclubs.pengke.service.IClassContentService;
-import com.healthclubs.pengke.service.IClassInfoService;
+import com.healthclubs.pengke.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +29,16 @@ public class TrainPlanController extends BaseController {
 
     @Autowired
     IClassContentService classContentService;
+
+    @Autowired
+    IUserTrainingPlanService userTrainingPlanService;
+
+    @Autowired
+    IUserTrainItemService userTrainItemService;
+
+    @Autowired
+    IUserTrainplanClassContentService userTrainplanClassContentService;
+
 
     //得到训练计划续联课内容
     @ApiOperation(value = "/getTrainClassByCoachId", notes = "得到教练下得课程")
@@ -129,5 +138,61 @@ public class TrainPlanController extends BaseController {
             return getResult(ResponseCode.GENERIC_FAILURE);
         }
     }
+
+
+    //创建训练课标签
+    @ApiOperation(value = "/createUserTrainPlan", notes = "创建训练计划")
+    @PostMapping(value = "/createUserTrainPlan")
+    public Result CreateUserTrainPlan(@RequestBody UserTrainingPlan userTrainingPlan)
+    {
+        try {
+
+            if (userTrainingPlan == null || userTrainingPlan.getCoachId()== null ||
+                    userTrainingPlan.getCoachId().isEmpty() || userTrainingPlan.getUserId() == null ||
+            userTrainingPlan.getUserId().isEmpty()) {
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userTrainingPlan);
+            }
+
+            String userTrainingPlanid = UUID.randomUUID().toString();
+            userTrainingPlan.setTrainingPlanId(userTrainingPlanid);
+            userTrainingPlanService.save(userTrainingPlan);
+
+           List<UserTrainItem>  userTrainItems = userTrainingPlan.getUserTrainItems();
+
+           if(userTrainItems!=null && userTrainItems.size()>0)
+           {
+               userTrainItems.stream().forEach(item->{
+                   item.setUserTrainitemId(UUID.randomUUID().toString());
+                   //设置训练计划id
+                   item.setTrainingPlanId(userTrainingPlanid);
+
+                   List<UserTrainplanClassContent> userTrainplanClassContents = item.getUserTrainplanClassContents();
+
+                   if(userTrainplanClassContents!=null&&userTrainplanClassContents.size()>0)
+                   {
+                       userTrainplanClassContents.stream().forEach(childitem->
+                       {
+                           childitem.setUserClasscontentId(UUID.randomUUID().toString());
+                           childitem.setTrainingPlanId(userTrainingPlanid);
+                       });
+
+                       //设置训练计划id
+                       userTrainplanClassContentService.saveBatch(userTrainplanClassContents);
+                   }
+               });
+
+               userTrainItemService.saveBatch(userTrainItems);
+           }
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED, userTrainingPlan);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
+
 
 }
