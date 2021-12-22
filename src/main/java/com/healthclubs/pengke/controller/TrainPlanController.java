@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @Api("trainPlan")
@@ -44,7 +45,6 @@ public class TrainPlanController extends BaseController {
 
     @Autowired
     IUserTraionSectionDetailService userTraionSectionDetailService;
-
 
     //得到训练计划续联课内容
     @ApiOperation(value = "/getTrainClassByCoachId", notes = "得到教练下得课程")
@@ -126,7 +126,6 @@ public class TrainPlanController extends BaseController {
         }
     }
 
-
     //创建训练课标签
     @ApiOperation(value = "/addTrainClassContent", notes = "创建训练课内容")
     @PostMapping(value = "/addTrainClassContent")
@@ -150,7 +149,6 @@ public class TrainPlanController extends BaseController {
             return getResult(ResponseCode.GENERIC_FAILURE);
         }
     }
-
 
     //创建训练课标签
     @ApiOperation(value = "/createUserTrainPlan", notes = "创建训练计划")
@@ -218,7 +216,6 @@ public class TrainPlanController extends BaseController {
         }
     }
 
-
     //创建训练课小节规划
     @ApiOperation(value = "/addUserTrainClassSection", notes = "创建训练课小节规划")
     @PostMapping(value = "/addUserTrainClassSection")
@@ -261,7 +258,6 @@ public class TrainPlanController extends BaseController {
         }
     }
 
-
     //创建训练课小节规划
     @ApiOperation(value = "/deleteCoachTrainClass", notes = "删除教练训练课")
     @PostMapping(value = "/deleteCoachTrainClass")
@@ -297,7 +293,6 @@ public class TrainPlanController extends BaseController {
         }
     }
 
-
     //得到训练课列表
     @ApiOperation(value = "/getUserClassByCoachId", notes = "得到用户的训练课列表")
     @GetMapping(value = "/getUserClassByCoachId")
@@ -327,5 +322,79 @@ public class TrainPlanController extends BaseController {
             return getResult(ResponseCode.GENERIC_FAILURE);
         }
     }
+
+    //删除用户的训练课
+    @ApiOperation(value = "/delUserTrainClassById", notes = "删除用户的训练课")
+    @GetMapping(value = "/delUserTrainClassById")
+    public Result delUserTrainClassById(String userTrainitemId)
+    {
+        try {
+            if (userTrainitemId == null ||userTrainitemId.isEmpty()) {
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userTrainitemId);
+            }
+            List<UsertrainPlanSection> usertrainPlanSections = this.usertrainPlanSectionService.list(
+                    new QueryWrapper<UsertrainPlanSection>()
+                    .eq("user_trainitem_id",userTrainitemId)
+                    .isNotNull("complete_time"));
+            if(usertrainPlanSections!=null && usertrainPlanSections.size()>0)
+            {
+                return getResult(ResponseCode.TRAINCLASS_IS_START, userTrainitemId);
+            }
+            else
+            {
+                List<UsertrainPlanSection> datas = this.usertrainPlanSectionService.list(
+                        new QueryWrapper<UsertrainPlanSection>().eq("user_trainitem_id",userTrainitemId));
+
+                List<String> usertrainPlanSectionIds = datas.stream().map(UsertrainPlanSection::getUsertrainSectionId)
+                        .collect(Collectors.toList());
+
+                if(usertrainPlanSectionIds==null || usertrainPlanSectionIds.size()==0)
+                {
+                    this.userTrainItemService.removeById(userTrainitemId);
+                    return getResult(ResponseCode.SUCCESS_PROCESSED, userTrainitemId);
+                }
+
+                List<UserTraionSectionDetail> userTraionSectionDetails = this.userTraionSectionDetailService.list(
+                        new QueryWrapper<UserTraionSectionDetail>().in("usertrain_section_id",usertrainPlanSectionIds)
+                );
+
+                if(userTraionSectionDetails!=null && userTraionSectionDetails.size()>0)
+                {
+                    this.userTraionSectionDetailService.removeByIds(userTraionSectionDetails);
+                }
+
+                this.usertrainPlanSectionService.removeByIds(usertrainPlanSectionIds);
+                this.userTrainItemService.removeById(userTrainitemId);
+            }
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED, userTrainitemId);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
+
+    //得到训练课内容细节
+    @ApiOperation(value = "/getTrainClassItemContent", notes = "删除用户的训练课")
+    @PostMapping(value = "/getTrainClassItemContent")
+    public Result getTrainClassItemContent(String userTrainitemId)
+    {
+        try {
+
+
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED, userTrainitemId);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
 
 }
