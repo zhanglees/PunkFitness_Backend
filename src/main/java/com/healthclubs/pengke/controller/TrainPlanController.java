@@ -6,6 +6,8 @@ import com.healthclubs.pengke.entity.*;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
+import com.healthclubs.pengke.pojo.dto.CoachTrainClassDto;
+import com.healthclubs.pengke.pojo.dto.UserTrainClassListDto;
 import com.healthclubs.pengke.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,7 +56,9 @@ public class TrainPlanController extends BaseController {
                 return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, coachId);
             }
 
+            Integer isShow = 1; //可见
             List<ClassInfo> classInfos = classInfoService.list(new QueryWrapper<ClassInfo>()
+                    .eq("is_show",isShow)
                     .eq("owner_id", coachId).or().eq("owner_id", "system"));
 
             if (classInfos != null && classInfos.size() > 0) {
@@ -92,6 +96,9 @@ public class TrainPlanController extends BaseController {
 
             classInfo.setClassId(UUID.randomUUID().toString());
             classInfo.setCreateTime(new Date());
+
+            Integer isShow = 1;//课程显示
+            classInfo.setIsShow(isShow);
 
             classInfoService.save(classInfo);
 
@@ -158,12 +165,16 @@ public class TrainPlanController extends BaseController {
                 return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userTrainingPlan);
             }
 
+            Date createTime = new Date();
+
             String userTrainingPlanid = UUID.randomUUID().toString();
             String userId = userTrainingPlan.getUserId();
             String coachId = userTrainingPlan.getCoachId();
 
             userTrainingPlan.setTrainingPlanId(userTrainingPlanid);
+            userTrainingPlan.setCreateTime(createTime);
             userTrainingPlanService.save(userTrainingPlan);
+
 
            List<UserTrainItem>  userTrainItems = userTrainingPlan.getUserTrainItems();
 
@@ -175,6 +186,8 @@ public class TrainPlanController extends BaseController {
                    item.setTrainingPlanId(userTrainingPlanid);
                    item.setUserId(userId);
                    item.setCoachId(coachId);
+                   //设置时间
+                   item.setCreateTime(createTime);
 
                    List<UserTrainplanClassContent> userTrainplanClassContents = item.getUserTrainplanClassContents();
 
@@ -248,5 +261,71 @@ public class TrainPlanController extends BaseController {
         }
     }
 
+
+    //创建训练课小节规划
+    @ApiOperation(value = "/deleteCoachTrainClass", notes = "删除教练训练课")
+    @PostMapping(value = "/deleteCoachTrainClass")
+    public Result DeleteCoachTrainClass(@RequestBody CoachTrainClassDto coachTrainClassDto)
+    {
+        try {
+
+            if (coachTrainClassDto == null || coachTrainClassDto.getCoachId()== null ||
+                    coachTrainClassDto.getCoachId().isEmpty() || coachTrainClassDto.getClassId() == null ||
+                    coachTrainClassDto.getClassId().isEmpty()) {
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, coachTrainClassDto);
+            }
+
+            String userTrainingPlanSectionId = UUID.randomUUID().toString();
+            String classId = coachTrainClassDto.getClassId();
+            String coachId = coachTrainClassDto.getCoachId();
+
+
+            ClassInfo classInfo = this.classInfoService.getById(classId);
+
+            if(classInfo.getOwnerId().equals(coachId) && classId!="system"){
+                Integer isShow = 0; //不可见
+                classInfo.setIsShow(isShow);
+                this.classInfoService.updateById(classInfo);
+            }
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED, classInfo);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
+
+    //得到训练课列表
+    @ApiOperation(value = "/getUserClassByCoachId", notes = "得到用户的训练课列表")
+    @GetMapping(value = "/getUserClassByCoachId")
+    public Result GetUserClassByCoachId(String userId,String coachId)
+    {
+        try {
+
+            if (userId == null || coachId== null ||
+                    userId.isEmpty() || coachId.isEmpty()) {
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userId+coachId);
+            }
+
+            UserTrainClassListDto userTrainClassListDto = new UserTrainClassListDto();
+
+            List<UserTrainItem> userTrainItems = this.userTrainItemService.getUserClassByCoachId(userId,coachId);
+            if(userTrainItems!=null && userTrainItems.size()>0)
+            {
+                userTrainClassListDto.setUserTrainItems(userTrainItems);
+                userTrainClassListDto.setTrainingPlanId(userTrainItems.get(0).getTrainingPlanId());
+            }
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED, userTrainClassListDto);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
 
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.healthclubs.pengke.mapper.IUserTrainItemMapper">
+
+    <select id="getUserClassByCoachId"
+            resultType="com.healthclubs.pengke.entity.UserTrainItem">
+select a.*,b.class_name,c.user_name as coachName,SUM(d.complete_time  is not null) as completeSections from usertrainitem as a
+INNER join classinfo as b on a.class_id = b.class_id
+INNER JOIN userinfo as c on a.coach_id = c.id
+INNER join usertrainplansection as d on a.user_trainitem_id = d.user_trainitem_id
+where a.user_id = #{userId} and a.coach_id = #{coachId}
+GROUP BY a.user_trainitem_id
+
+     </select>
+</mapper>
