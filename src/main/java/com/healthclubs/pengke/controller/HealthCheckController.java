@@ -14,10 +14,7 @@ import com.healthclubs.pengke.service.IUserhealthcheckResourceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -177,6 +174,34 @@ public class HealthCheckController extends BaseController {
 
             return getResult(ResponseCode.SUCCESS_PROCESSED,userHealthCheckDto
                     );
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
+
+    //得到最近一次身体数据
+    @ApiOperation(value = "/getLastHealthReport", notes = "得到最后一次身体数据")
+    @GetMapping(value = "/getLastHealthReport")
+    public Result getLastHealthReport(String userId, String coachId)
+    {
+        try {
+
+            if (userId == null ||userId.isEmpty() || coachId == null || coachId.isEmpty()) {
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, false);
+            }
+
+            UserhealthcheckReport userhealthcheckReport = new UserhealthcheckReport();
+
+            userhealthcheckReport = userhealthcheckReportService.getOne(new QueryWrapper<UserhealthcheckReport>()
+                    .eq("user_id",userId)
+                    .eq("coach_id",coachId).orderByDesc("create_time").last("limit 1"));
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED, userhealthcheckReport);
         } catch (PengkeException e) {
             return getResult(e.getCode());
         } catch (Exception e) {

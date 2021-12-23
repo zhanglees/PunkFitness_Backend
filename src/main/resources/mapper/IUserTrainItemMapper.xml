@@ -10,6 +10,6 @@ INNER JOIN userinfo as c on a.coach_id = c.id
 left join usertrainplansection as d on a.user_trainitem_id = d.user_trainitem_id
 where a.user_id = #{userId} and a.coach_id = #{coachId}
 GROUP BY a.user_trainitem_id
-
+order by b.create_time desc
      </select>
 </mapper>

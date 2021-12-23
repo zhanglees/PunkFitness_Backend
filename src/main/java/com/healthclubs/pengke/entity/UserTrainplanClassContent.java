@@ -38,4 +38,10 @@ public class UserTrainplanClassContent extends Model<UserTrainplanClassContent> 
 
     public String contentItemValue;
 
+    @TableField(exist = false)
+    public Integer trainTarg;
+
+    @TableField(exist = false)
+    public String itemName;
+
 }

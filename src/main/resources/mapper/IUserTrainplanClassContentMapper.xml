@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.healthclubs.pengke.mapper.IUserTrainplanClassContentMapper">
+
+    <select id="getTrainClassItemContent"
+            resultType="com.healthclubs.pengke.entity.UserTrainplanClassContent">
+
+SELECT a.*,b.item_name,b.train_targ from usertrainplanclasscontent as a
+inner JOIN classcontent as b on a.class_content_id = b.class_content_id
+where a.class_id = #{classId}
+and a.training_plan_id = #{trainingPlanId}
+and a.user_id = #{userId}
+and a.coach_id =#{coachId}
+
+
+     </select>
+</mapper>

@@ -46,6 +46,9 @@ public class TrainPlanController extends BaseController {
     @Autowired
     IUserTraionSectionDetailService userTraionSectionDetailService;
 
+    @Autowired
+    private IUserhealthcheckReportService userhealthcheckReportService;
+
     //得到训练计划续联课内容
     @ApiOperation(value = "/getTrainClassByCoachId", notes = "得到教练下得课程")
     @GetMapping(value = "/getTrainClassByCoachId")
@@ -381,13 +384,17 @@ public class TrainPlanController extends BaseController {
     //得到训练课内容细节
     @ApiOperation(value = "/getTrainClassItemContent", notes = "删除用户的训练课")
     @PostMapping(value = "/getTrainClassItemContent")
-    public Result getTrainClassItemContent(String userTrainitemId)
+    public Result getTrainClassItemContent(@RequestBody UserTrainItem userTrainItem)
     {
         try {
 
+            List<UserTrainplanClassContent> userTrainplanClassContents =
+                    userTrainplanClassContentService.getTrainClassItemContent(userTrainItem.getClassId(),
+                            userTrainItem.getTrainingPlanId(),userTrainItem.getUserId(),userTrainItem.getCoachId());
 
+            userTrainItem.setUserTrainplanClassContents(userTrainplanClassContents);
 
-            return getResult(ResponseCode.SUCCESS_PROCESSED, userTrainitemId);
+            return getResult(ResponseCode.SUCCESS_PROCESSED, userTrainItem);
         } catch (PengkeException e) {
             return getResult(e.getCode());
         } catch (Exception e) {
@@ -395,6 +402,5 @@ public class TrainPlanController extends BaseController {
             return getResult(ResponseCode.GENERIC_FAILURE);
         }
     }
-
 
 }
