@@ -62,4 +62,8 @@ public class ClassInfo extends Model<ClassInfo> {
 
     @TableField(exist = false)
     public List<ClassContent> classContents;
+
+
+    @TableField(exist = false)
+    public UserTrainItem userTrainItem;
 }

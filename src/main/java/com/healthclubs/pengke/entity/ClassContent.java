@@ -37,4 +37,7 @@ public class ClassContent extends Model<ClassContent> {
 
     public String owner;
 
+    @TableField(exist = false)
+    public boolean userChose =false;
+
 }

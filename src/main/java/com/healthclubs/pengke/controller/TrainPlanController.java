@@ -416,8 +416,60 @@ public class TrainPlanController extends BaseController {
                 return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, trainPlainId+":"+userId+":"+coachId);
             }
 
+            if(trainPlainId == null || trainPlainId.isEmpty()){
+                return this.getTrainClassByCoachId(coachId);
+            }
+            else {
 
-            return getResult(ResponseCode.SUCCESS_PROCESSED, 1);
+                List<ClassInfo> classInfos = classInfoService.list(new QueryWrapper<ClassInfo>()
+                        .eq("owner_id", coachId).or().eq("owner_id", "system"));
+
+                if (classInfos != null && classInfos.size() > 0) {
+
+                    classInfos.stream().forEach(item -> {
+
+                        UserTrainItem userTrainItem = userTrainItemService.getOne(new QueryWrapper<UserTrainItem>()
+                                .eq("class_id",item.getClassId())
+                                .eq("user_id",userId)
+                                .eq("coach_id",coachId)
+                                .eq("training_plan_id",trainPlainId).last("limit 1"));
+
+                        if(userTrainItem!=null)
+                        {
+                            item.setUserTrainItem(userTrainItem);
+                        }
+
+                        List<ClassContent> classContents = classContentService.list(new QueryWrapper<ClassContent>()
+
+                                .eq("owner", coachId).or().eq("owner", "system")
+                                .eq("train_class_id", item.getClassId()));
+
+                        if (classContents != null && classContents.size() > 0) {
+
+                            classContents.stream().forEach(contentItem->{
+                                UserTrainplanClassContent userTrainplanClassContent = userTrainplanClassContentService.getOne(new QueryWrapper<UserTrainplanClassContent>()
+                                .eq("class_content_id",contentItem.getClassContentId())
+                                .eq("training_plan_id",trainPlainId)
+                                .eq("user_id",userId)
+                                .eq("coach_id",coachId).last("limit 1"));
+
+                                if(userTrainplanClassContent!=null)
+                                {
+                                    contentItem.setUserChose(true);
+                                    contentItem.setItemValue(userTrainplanClassContent.contentItemValue);
+                                }
+
+                            });
+
+                            item.setClassContents(classContents);
+                        }
+                    });
+                }
+
+                return getResult(ResponseCode.SUCCESS_PROCESSED, classInfos);
+            }
+
+
         } catch (PengkeException e) {
             return getResult(e.getCode());
         } catch (Exception e) {
