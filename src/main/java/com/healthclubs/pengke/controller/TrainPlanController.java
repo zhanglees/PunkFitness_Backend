@@ -153,7 +153,7 @@ public class TrainPlanController extends BaseController {
         }
     }
 
-    //创建训练课标签
+    //创建训练计划
     @ApiOperation(value = "/createUserTrainPlan", notes = "创建训练计划")
     @PostMapping(value = "/createUserTrainPlan")
     public Result CreateUserTrainPlan(@RequestBody UserTrainingPlan userTrainingPlan)
@@ -261,7 +261,7 @@ public class TrainPlanController extends BaseController {
         }
     }
 
-    //创建训练课小节规划
+    //删除教练训练课
     @ApiOperation(value = "/deleteCoachTrainClass", notes = "删除教练训练课")
     @PostMapping(value = "/deleteCoachTrainClass")
     public Result DeleteCoachTrainClass(@RequestBody CoachTrainClassDto coachTrainClassDto)
@@ -402,5 +402,87 @@ public class TrainPlanController extends BaseController {
             return getResult(ResponseCode.GENERIC_FAILURE);
         }
     }
+
+
+    //得到训练课细节
+    @ApiOperation(value = "/getUserTrainPlainDetai", notes = "得到训练课细节")
+    @GetMapping(value = "/getUserTrainPlainDetai")
+    public Result getUserTrainPlainDetail(String trainPlainId,String userId,String coachId)
+    {
+        try {
+
+            if (userId==null || userId.isEmpty() || coachId == null || coachId.isEmpty()){
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, trainPlainId+":"+userId+":"+coachId);
+            }
+
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED, 1);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
+
+
+    //创建用户训练课
+    @ApiOperation(value = "/createUserTrainClass", notes = "创建用户训练课")
+    @PostMapping(value = "/createUserTrainClass")
+    public Result createUserTrainClass(@RequestBody  UserTrainClassListDto userTrainClassListDto)
+    {
+        try {
+
+            if (userTrainClassListDto==null || userTrainClassListDto.getTrainingPlanId() == null
+                    || userTrainClassListDto.getTrainingPlanId().isEmpty()){
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userTrainClassListDto);
+            }
+
+            String userTrainingPlanid = userTrainClassListDto.getTrainingPlanId();
+
+            if(userTrainClassListDto.getUserTrainItems()!=null && userTrainClassListDto.getUserTrainItems().size()>0){
+                userTrainClassListDto.getUserTrainItems().stream().forEach(item->{
+                    item.setUserTrainitemId(UUID.randomUUID().toString());
+                    item.setCreateTime(new Date());
+                    item.setTrainingPlanId(userTrainingPlanid);
+
+                    item.setUserId(userTrainClassListDto.getUserId());
+                    item.setCoachId(userTrainClassListDto.getCoachId());
+
+                    List<UserTrainplanClassContent> userTrainplanClassContents = item.getUserTrainplanClassContents();
+
+                    if(userTrainplanClassContents!=null&&userTrainplanClassContents.size()>0)
+                    {
+                        userTrainplanClassContents.stream().forEach(childitem->
+                        {
+                            childitem.setUserClasscontentId(UUID.randomUUID().toString());
+                            childitem.setTrainingPlanId(userTrainingPlanid);
+                            childitem.setUserId(userTrainClassListDto.getUserId());
+                            childitem.setCoachId(userTrainClassListDto.getCoachId());
+                        });
+
+                        //设置训练计划id
+                        userTrainplanClassContentService.saveBatch(userTrainplanClassContents);
+                    }
+
+                });
+
+                userTrainItemService.saveBatch(userTrainClassListDto.getUserTrainItems());
+            }
+
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED, userTrainClassListDto);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
+
 
 }

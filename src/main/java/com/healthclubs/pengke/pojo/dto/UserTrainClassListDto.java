@@ -26,4 +26,24 @@ public class UserTrainClassListDto {
 
     public List<UserTrainItem> userTrainItems;
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getCoachId() {
+        return coachId;
+    }
+
+    public void setCoachId(String coachId) {
+        this.coachId = coachId;
+    }
+
+    public String userId;
+
+    public String coachId;
+
 }
