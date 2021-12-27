@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -575,13 +576,86 @@ public class TrainPlanController extends BaseController {
                 this.userTrainItemService.updateById(userTrainItem);
             }
 
+            List<UserTrainplanClassContent> currentContents =userTrainItem.getUserTrainplanClassContents();
+
+            List<UserTrainplanClassContent> oldContents = this.userTrainplanClassContentService.list(new
+                        QueryWrapper<UserTrainplanClassContent>().eq("user_id",userTrainItem.getUserId())
+                .eq("coach_id",userTrainItem.getCoachId())
+                .eq("training_plan_id",userTrainItem.getTrainingPlanId())
+                .eq("class_id",userTrainItem.getClassId()));
+
+            if(currentContents==null || currentContents.size()==0)
+            {
+                if(oldContents!=null && oldContents.size()>0)
+                {
+                    List<String> deltempids = oldContents.stream().map(UserTrainplanClassContent::getUserClasscontentId).collect(Collectors.toList());
+                    userTrainplanClassContentService.remove(new QueryWrapper<UserTrainplanClassContent>().in(
+                            "user_classcontent_id",deltempids
+                    ));
+                }
+            }
+            else
+            {
+                if(currentContents.size()>0)
+                {
+                    if(oldContents==null || oldContents.size()==0)
+                    {
+                        currentContents.stream().forEach(item->{
+                            item.setUserClasscontentId(UUID.randomUUID().toString());
+                            item.setCoachId(userTrainItem.getCoachId());
+                            item.setUserId(userTrainItem.getUserId());
+                        });
+                        userTrainplanClassContentService.saveBatch(currentContents);
+                    }
+                    else
+                    {
+                        //比较不同 删除。 比较不同添加。
+                        List<UserTrainplanClassContent> deletes = new ArrayList<>();
+                        List<UserTrainplanClassContent> adds = new ArrayList<>();
+
+                        List<String> contentIds = oldContents.stream().map(UserTrainplanClassContent::getClassContentId).collect(Collectors.toList());
+                        List<String> contentOlds = currentContents.stream().map(UserTrainplanClassContent::getClassContentId).collect(Collectors.toList());
+
+                        List<String> delIds = new ArrayList<>();
+                        currentContents.stream().forEach(item->{
+                            if(!contentIds.contains(item.getClassContentId()))
+                            {
+                                item.setUserClasscontentId(UUID.randomUUID().toString());
+                                item.setUserId(userTrainItem.getUserId());
+                                item.setCoachId(userTrainItem.getCoachId());
+
+                                adds.add(item);
+                            }
+                        });
+
+                        oldContents.stream().forEach(item->{
+                            if(!contentOlds.contains(item.getClassContentId())){
+                                deletes.add(item);
+                                delIds.add(item.getUserClasscontentId());
+                            }
+                        });
+
+                        if(deletes!=null && deletes.size()>0){
+                            this.userTrainplanClassContentService.remove(new QueryWrapper<UserTrainplanClassContent>().in(
+                                    "user_classcontent_id",delIds
+                            ));
+                        }
+
+                        if(adds!=null && adds.size()>0){
+                            this.userTrainplanClassContentService.saveBatch(adds);
+                        }
+
+                    }
+
+                }
+            }
 
             return getResult(ResponseCode.SUCCESS_PROCESSED, userTrainItem);
         } catch (PengkeException e) {
             return getResult(e.getCode());
         } catch (Exception e) {
             e.printStackTrace();
-            return getResult(ResponseCode.GENERIC_FAILURE);
+            return getResult(ResponseCode.GENERIC_FAILURE,e.getMessage());
         }
     }
 
