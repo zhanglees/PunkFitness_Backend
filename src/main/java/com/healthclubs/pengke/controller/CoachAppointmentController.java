@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.healthclubs.pengke.entity.UserAppointment;
 import com.healthclubs.pengke.entity.UserAppointmentHistory;
 import com.healthclubs.pengke.entity.UserInfo;
+import com.healthclubs.pengke.entity.UsertrainPlanSection;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
@@ -13,14 +14,12 @@ import com.healthclubs.pengke.pojo.dto.SingInDto;
 import com.healthclubs.pengke.service.IUserAppointmentHistoryService;
 import com.healthclubs.pengke.service.IUserAppointmentService;
 import com.healthclubs.pengke.service.IUserService;
+import com.healthclubs.pengke.service.IUsertrainPlanSectionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -37,6 +36,9 @@ public class CoachAppointmentController extends BaseController {
 
     @Autowired
     IUserService userService;
+
+    @Autowired
+    IUsertrainPlanSectionService usertrainPlanSectionService;
 
     //预约
     @ApiOperation(value = "/appointment", notes = "预约")
@@ -68,8 +70,23 @@ public class CoachAppointmentController extends BaseController {
     public Result coachSingIn(@RequestBody SingInDto singInDto) {
         try {
 
+            if (singInDto==null || singInDto.getCoachId() == null
+                    || singInDto.getCoachId().isEmpty()
+                    ||singInDto.getUserId() == null || singInDto.getUserId().isEmpty()
+            ||singInDto.getUsertrainSectionId() == null || singInDto.getUsertrainSectionId().isEmpty()){
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, singInDto);
+            }
+
+            UsertrainPlanSection usertrainPlanSection = new UsertrainPlanSection();
+            usertrainPlanSection = usertrainPlanSectionService.getById(singInDto.getUsertrainSectionId());
+            usertrainPlanSection.setCompleteTime(new Date());
+            usertrainPlanSectionService.updateById(usertrainPlanSection);
+
+
             singInDto.setSinginId(UUID.randomUUID().toString());
             userAppointmentHistoryService.save(singInDto);
+
+
 
             return getResult(ResponseCode.SUCCESS_PROCESSED, singInDto);
         } catch (PengkeException e) {
@@ -96,7 +113,7 @@ public class CoachAppointmentController extends BaseController {
 
     //用户 根据时间得到预约
     @ApiOperation(value = "/getAppointmentAllByDate", notes = "根据时间得到预约")
-    @RequestMapping("/getAppointmentAllByDate")
+    @GetMapping("/getAppointmentAllByDate")
     public Result getAppointmentAllByDate(String userId,Date date)
     {
         try {
@@ -114,7 +131,7 @@ public class CoachAppointmentController extends BaseController {
 
     //教练 根据时间得到预约的人数
     @ApiOperation(value = "/getAppointMembersByDates", notes = "根据时间得到预约")
-    @RequestMapping("/getAppointMembersByDates")
+    @GetMapping("/getAppointMembersByDates")
     public Result getAppointMembersByDates(String coachId,Integer dateType,Integer customerType)
     {
         try {
@@ -158,6 +175,8 @@ public class CoachAppointmentController extends BaseController {
         }
 
     }
+
+
 
 
 }

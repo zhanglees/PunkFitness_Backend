@@ -773,4 +773,35 @@ public class TrainPlanController extends BaseController {
     }
 
 
+    //得到所有课程课时列表
+    @ApiOperation(value = "/getUserSectionList", notes = "编辑训练课下的训练课时")
+    @PostMapping("/getUserSectionList")
+    public Result getUserSectionList(@RequestBody UsertrainPlanSection usertrainPlanSection)
+    {
+        try {
+
+            if (usertrainPlanSection==null || usertrainPlanSection.getCoachId() == null
+                    || usertrainPlanSection.getCoachId().isEmpty()
+                    ||usertrainPlanSection.getUserId() == null || usertrainPlanSection.getUserId().isEmpty()){
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, usertrainPlanSection);
+            }
+
+            List<UsertrainPlanSection> usertrainPlanSections = new ArrayList<>();
+            usertrainPlanSections = this.usertrainPlanSectionService.list(new QueryWrapper<UsertrainPlanSection>()
+            .isNotNull("complete_time")
+            .eq("user_id",usertrainPlanSection.getUserId())
+            .eq("coach_id",usertrainPlanSection.getCoachId())
+             .orderByDesc("create_time"));
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,usertrainPlanSections) ;
+
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+
+    }
+
 }
