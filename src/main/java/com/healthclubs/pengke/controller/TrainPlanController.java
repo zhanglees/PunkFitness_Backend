@@ -6,6 +6,7 @@ import com.healthclubs.pengke.entity.*;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
+import com.healthclubs.pengke.pojo.dto.AppointmentMembersViewDto;
 import com.healthclubs.pengke.pojo.dto.CoachTrainClassDto;
 import com.healthclubs.pengke.pojo.dto.UserTrainClassListDto;
 import com.healthclubs.pengke.pojo.dto.UserTrainPlanDto;
@@ -15,10 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -684,6 +682,95 @@ public class TrainPlanController extends BaseController {
         }
     }
 
+
+    //得到训练课的所有预约未签到的小课时
+    @ApiOperation(value = "/getUserClassSection", notes = "得到训练课的所有预约未签到的小课时")
+    @PostMapping("/getUserClassSection")
+    public Result getUserClassSection(@RequestBody UserTrainItem userTrainItem)
+    {
+        try {
+
+            if (userTrainItem==null || userTrainItem.getTrainingPlanId() == null
+                    || userTrainItem.getTrainingPlanId().isEmpty()){
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userTrainItem);
+            }
+
+            List<UsertrainPlanSection> usertrainPlanSections = this.usertrainPlanSectionService.list(new
+                    QueryWrapper<UsertrainPlanSection>().eq("user_id",userTrainItem.getUserId())
+            .eq("coach_id",userTrainItem.getCoachId())
+            .eq("user_trainitem_id",userTrainItem.getUserTrainitemId())
+            .eq("training_plan_id",userTrainItem.getTrainingPlanId()));
+            //.eq(""))
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,usertrainPlanSections) ;
+
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+
+    }
+
+
+    //编辑训练课下的训练课时
+    @ApiOperation(value = "/editUserClassSection", notes = "编辑训练课下的训练课时")
+    @PostMapping("/editUserClassSection")
+    public Result editUserClassSection(@RequestBody UsertrainPlanSection usertrainPlanSection)
+    {
+        try {
+
+            if (usertrainPlanSection==null || usertrainPlanSection.getUsertrainSectionId() == null
+                    || usertrainPlanSection.getUsertrainSectionId().isEmpty()){
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, usertrainPlanSection);
+            }
+
+            List<UserTraionSectionDetail> userTraionSectionDetails = new ArrayList<>();
+
+            userTraionSectionDetails = this.userTraionSectionDetailService.list(new
+                    QueryWrapper<UserTraionSectionDetail>().eq("user_id",usertrainPlanSection.getUserId())
+                    .eq("coach_id",usertrainPlanSection.getCoachId())
+                    .eq("usertrain_section_id",usertrainPlanSection.getUsertrainSectionId()));
+            usertrainPlanSection.setUserTraionSectionDetails(userTraionSectionDetails);
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,usertrainPlanSection) ;
+
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+
+    }
+
+
+    //编辑训练课下的训练课时
+    @ApiOperation(value = "/delUserSectionDetail", notes = "编辑训练课下的训练课时")
+    @PostMapping("/delUserSectionDetail")
+    public Result delUserSectionDetail(@RequestBody UserTraionSectionDetail userTraionSectionDetail)
+    {
+        try {
+
+            if (userTraionSectionDetail==null || userTraionSectionDetail.getSectionDetailId() == null
+                    || userTraionSectionDetail.getSectionDetailId().isEmpty()
+            ||userTraionSectionDetail.getUserId() == null || userTraionSectionDetail.getUserId().isEmpty()){
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userTraionSectionDetail);
+            }
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,userTraionSectionDetailService.removeById(userTraionSectionDetail)) ;
+
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+
+    }
 
 
 }
