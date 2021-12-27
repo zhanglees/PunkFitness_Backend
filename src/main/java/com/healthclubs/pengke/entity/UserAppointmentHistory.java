@@ -43,4 +43,8 @@ public class UserAppointmentHistory extends Model<UserAppointmentHistory> {
     @TableField(exist = false)
     public String userName;
 
+    public String coachId;
+
+    public String usertrainSectionId;
+
 }

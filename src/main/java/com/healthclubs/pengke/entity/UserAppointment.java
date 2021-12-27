@@ -50,4 +50,6 @@ public class UserAppointment extends Model<UserAppointment> {
     private Integer classHour;
 
 
+
+
 }

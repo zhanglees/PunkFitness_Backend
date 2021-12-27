@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 
 @RestController
-@Api("UserAppointment")
-@RequestMapping("/api/userAppointment")
-public class UserAppointmentController extends BaseController {
+@Api("coachAppointment")
+@RequestMapping("/api/coachAppointment")
+public class CoachAppointmentController extends BaseController {
 
     @Autowired
     IUserAppointmentService userAppointmentService;
@@ -65,7 +65,7 @@ public class UserAppointmentController extends BaseController {
     //学员签到
     @ApiOperation(value = "/singIn", notes = "签到")
     @PostMapping(value = "/singIn")
-    public Result useringIn(@RequestBody SingInDto singInDto) {
+    public Result coachSingIn(@RequestBody SingInDto singInDto) {
         try {
 
             singInDto.setSinginId(UUID.randomUUID().toString());

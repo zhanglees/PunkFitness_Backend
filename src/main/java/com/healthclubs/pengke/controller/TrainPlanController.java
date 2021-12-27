@@ -8,6 +8,7 @@ import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
 import com.healthclubs.pengke.pojo.dto.CoachTrainClassDto;
 import com.healthclubs.pengke.pojo.dto.UserTrainClassListDto;
+import com.healthclubs.pengke.pojo.dto.UserTrainPlanDto;
 import com.healthclubs.pengke.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -416,8 +417,13 @@ public class TrainPlanController extends BaseController {
                 return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, trainPlainId+":"+userId+":"+coachId);
             }
 
+            UserTrainPlanDto  userTrainPlanDto = new UserTrainPlanDto();
+
             if(trainPlainId == null || trainPlainId.isEmpty()){
-                return this.getTrainClassByCoachId(coachId);
+
+                List<ClassInfo> classInfos = (List<ClassInfo>)this.getTrainClassByCoachId(coachId).getData();
+                userTrainPlanDto.setClassInfos(classInfos);
+                //return this.getTrainClassByCoachId(coachId);
             }
             else {
 
@@ -429,32 +435,32 @@ public class TrainPlanController extends BaseController {
                     classInfos.stream().forEach(item -> {
 
                         UserTrainItem userTrainItem = userTrainItemService.getOne(new QueryWrapper<UserTrainItem>()
-                                .eq("class_id",item.getClassId())
-                                .eq("user_id",userId)
-                                .eq("coach_id",coachId)
-                                .eq("training_plan_id",trainPlainId).last("limit 1"));
+                                .eq("class_id", item.getClassId())
+                                .eq("user_id", userId)
+                                .eq("coach_id", coachId)
+                                .eq("training_plan_id", trainPlainId).last("limit 1"));
 
-                        if(userTrainItem!=null)
-                        {
+                        if (userTrainItem != null) {
                             item.setUserTrainItem(userTrainItem);
                         }
 
                         List<ClassContent> classContents = classContentService.list(new QueryWrapper<ClassContent>()
+                                .eq("train_class_id", item.getClassId())
+                                .and(QueryWrapper->QueryWrapper.eq("owner",coachId).or()
+                                        .eq("owner","system")));
 
-                                .eq("owner", coachId).or().eq("owner", "system")
-                                .eq("train_class_id", item.getClassId()));
 
                         if (classContents != null && classContents.size() > 0) {
 
-                            classContents.stream().forEach(contentItem->{
+                            classContents.stream().forEach(contentItem -> {
                                 UserTrainplanClassContent userTrainplanClassContent = userTrainplanClassContentService.getOne(new QueryWrapper<UserTrainplanClassContent>()
-                                .eq("class_content_id",contentItem.getClassContentId())
-                                .eq("training_plan_id",trainPlainId)
-                                .eq("user_id",userId)
-                                .eq("coach_id",coachId).last("limit 1"));
+                                        .eq("class_content_id", contentItem.getClassContentId())
+                                        .eq("training_plan_id", trainPlainId)
+                                        .eq("class_id", contentItem.getTrainClassId())
+                                        .eq("user_id", userId)
+                                        .eq("coach_id", coachId).last("limit 1"));
 
-                                if(userTrainplanClassContent!=null)
-                                {
+                                if (userTrainplanClassContent != null) {
                                     contentItem.setUserChose(true);
                                     contentItem.setItemValue(userTrainplanClassContent.contentItemValue);
                                 }
@@ -466,9 +472,15 @@ public class TrainPlanController extends BaseController {
                     });
                 }
 
-                return getResult(ResponseCode.SUCCESS_PROCESSED, classInfos);
+                UserTrainingPlan userTrainingPlan = new UserTrainingPlan();
+                userTrainingPlan = this.userTrainingPlanService.getById(trainPlainId);
+                userTrainPlanDto.setClassInfos(classInfos);
+                userTrainPlanDto.setUserTrainingPlan(userTrainingPlan);
+
+               // return getResult(ResponseCode.SUCCESS_PROCESSED, classInfos);
             }
 
+            return getResult(ResponseCode.SUCCESS_PROCESSED, userTrainPlanDto);
 
         } catch (PengkeException e) {
             return getResult(e.getCode());
@@ -527,6 +539,69 @@ public class TrainPlanController extends BaseController {
 
 
             return getResult(ResponseCode.SUCCESS_PROCESSED, userTrainClassListDto);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
+
+    //修改训练课
+    @ApiOperation(value = "/modifyUserTrainClass", notes = "修改训练课")
+    @PostMapping(value = "/modifyUserTrainClass")
+    public Result modifyUserTrainClass(@RequestBody  UserTrainItem userTrainItem)
+    {
+        try {
+
+            if (userTrainItem==null || userTrainItem.getTrainingPlanId() == null
+                    || userTrainItem.getTrainingPlanId().isEmpty()){
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userTrainItem);
+            }
+
+            String userTrainitemId = userTrainItem.getUserTrainitemId();
+            List<UsertrainPlanSection> usertrainPlanSections = this.usertrainPlanSectionService.list(
+                    new QueryWrapper<UsertrainPlanSection>()
+                            .eq("user_trainitem_id",userTrainitemId)
+                            .isNotNull("complete_time"));
+            if(usertrainPlanSections!=null && usertrainPlanSections.size()>0)
+            {
+                return getResult(ResponseCode.TRAINCLASS_IS_START, userTrainitemId);
+            }
+            else
+            {
+                this.userTrainItemService.updateById(userTrainItem);
+            }
+
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED, userTrainItem);
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+    }
+
+
+    //修改训练计划
+    @ApiOperation(value = "/modifyUserTrainPlan", notes = "修改训练计划")
+    @PostMapping(value = "/modifyUserTrainPlan")
+    public Result modifyUserTrainPlan(@RequestBody  UserTrainingPlan userTrainingPlan)
+    {
+        try {
+
+            if (userTrainingPlan==null || userTrainingPlan.getTrainingPlanId() == null
+                    || userTrainingPlan.getTrainingPlanId().isEmpty()){
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userTrainingPlan);
+            }
+
+            this.userTrainingPlanService.updateById(userTrainingPlan);
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED, userTrainingPlan);
         } catch (PengkeException e) {
             return getResult(e.getCode());
         } catch (Exception e) {
