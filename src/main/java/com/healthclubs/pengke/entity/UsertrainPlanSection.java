@@ -57,4 +57,10 @@ public class UsertrainPlanSection extends Model<UsertrainPlanSection> {
 
     @TableField(exist = false)
     public List<UserTraionSectionDetail> userTraionSectionDetails;
+
+
+    /**
+     * 显示顺序
+     */
+    public Integer showOrder;
 }

@@ -6,10 +6,7 @@ import com.healthclubs.pengke.entity.*;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
-import com.healthclubs.pengke.pojo.dto.AppointmentMembersViewDto;
-import com.healthclubs.pengke.pojo.dto.CoachTrainClassDto;
-import com.healthclubs.pengke.pojo.dto.UserTrainClassListDto;
-import com.healthclubs.pengke.pojo.dto.UserTrainPlanDto;
+import com.healthclubs.pengke.pojo.dto.*;
 import com.healthclubs.pengke.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -45,6 +42,7 @@ public class TrainPlanController extends BaseController {
 
     @Autowired
     IUserTraionSectionDetailService userTraionSectionDetailService;
+
 
     @Autowired
     private IUserhealthcheckReportService userhealthcheckReportService;
@@ -380,7 +378,6 @@ public class TrainPlanController extends BaseController {
         }
     }
 
-
     //得到训练课内容细节
     @ApiOperation(value = "/getTrainClassItemContent", notes = "删除用户的训练课")
     @PostMapping(value = "/getTrainClassItemContent")
@@ -488,8 +485,6 @@ public class TrainPlanController extends BaseController {
             return getResult(ResponseCode.GENERIC_FAILURE);
         }
     }
-
-
 
     //创建用户训练课
     @ApiOperation(value = "/createUserTrainClass", notes = "创建用户训练课")
@@ -716,9 +711,9 @@ public class TrainPlanController extends BaseController {
 
 
     //编辑训练课下的训练课时
-    @ApiOperation(value = "/editUserClassSection", notes = "编辑训练课下的训练课时")
-    @PostMapping("/editUserClassSection")
-    public Result editUserClassSection(@RequestBody UsertrainPlanSection usertrainPlanSection)
+    @ApiOperation(value = "/getUserClassSectionDetail", notes = "编辑训练课下的训练课时")
+    @PostMapping("/getUserClassSectionDetail")
+    public Result getUserClassSectionDetail(@RequestBody UsertrainPlanSection usertrainPlanSection)
     {
         try {
 
@@ -748,8 +743,8 @@ public class TrainPlanController extends BaseController {
     }
 
 
-    //编辑训练课下的训练课时
-    @ApiOperation(value = "/delUserSectionDetail", notes = "编辑训练课下的训练课时")
+    //删除训练课小节
+    @ApiOperation(value = "/delUserSectionDetail", notes = "删除训练课小节")
     @PostMapping("/delUserSectionDetail")
     public Result delUserSectionDetail(@RequestBody UserTraionSectionDetail userTraionSectionDetail)
     {
@@ -803,5 +798,185 @@ public class TrainPlanController extends BaseController {
         }
 
     }
+
+
+    //编辑训练课的小时课
+    @ApiOperation(value = "/submitUserClassSection", notes = "编辑训练课的小时课")
+    @PostMapping("/submitUserClassSection")
+    public Result submitUserClassSection(@RequestBody UsertrainPlanSection usertrainPlanSection)
+    {
+        try {
+
+            if (usertrainPlanSection==null || usertrainPlanSection.getUsertrainSectionId() == null
+                    || usertrainPlanSection.getUsertrainSectionId().isEmpty()){
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, usertrainPlanSection);
+            }
+            //usertrainPlanSectionService.updateById(usertrainPlanSection);
+
+            usertrainPlanSectionService.updateById(usertrainPlanSection);
+            return getResult(ResponseCode.SUCCESS_PROCESSED,usertrainPlanSection);
+
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+
+    }
+
+    //添加一个小节课下的小节细节
+    @ApiOperation(value = "/adddUserSectionDetail", notes = "添加一个小节课下的小节细节")
+    @PostMapping("/adddUserSectionDetail")
+    public Result adddUserSectionDetail(@RequestBody UserTraionSectionDetail userTraionSectionDetail)
+    {
+        try {
+
+            if (userTraionSectionDetail==null || userTraionSectionDetail.getUsertrainSectionId() == null
+                    || userTraionSectionDetail.getUsertrainSectionId().isEmpty()){
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userTraionSectionDetail);
+            }
+            //usertrainPlanSectionService.updateById(usertrainPlanSection);
+            userTraionSectionDetail.setSectionDetailId(UUID.randomUUID().toString());
+            userTraionSectionDetailService.save(userTraionSectionDetail);
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,userTraionSectionDetail);
+
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+
+    }
+
+
+
+    //编辑训练课的小时课一个细节
+    @ApiOperation(value = "/editUserClassSectionDetail", notes = "编辑训练课的小时课")
+    @PostMapping("/editUserClassSectionDetail")
+    public Result editUserClassSectionDetail(@RequestBody UserTraionSectionDetail userTraionSectionDetail)
+    {
+        try {
+
+            if (userTraionSectionDetail==null || userTraionSectionDetail.getSectionDetailId() == null
+                    || userTraionSectionDetail.getSectionDetailId().isEmpty()){
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userTraionSectionDetail);
+            }
+            //usertrainPlanSectionService.updateById(usertrainPlanSection);
+
+            userTraionSectionDetailService.updateById(userTraionSectionDetail);
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,userTraionSectionDetail) ;
+
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+
+    }
+
+    //编辑训练课的小时课一个细节
+    @ApiOperation(value = "/deleteUserClassSection", notes = "删除训练课小时课")
+    @PostMapping("/deleteUserClassSection")
+    public Result deleteUserClassSection(@RequestBody UsertrainPlanSection usertrainPlanSection)
+    {
+        try {
+
+            if (usertrainPlanSection==null || usertrainPlanSection.getUsertrainSectionId() == null
+                    || usertrainPlanSection.getUsertrainSectionId().isEmpty()){
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, usertrainPlanSection);
+            }
+
+            if(usertrainPlanSection.getCompleteTime()!=null)
+            {
+                return getResult(ResponseCode.TRAINCLASS_IS_START, usertrainPlanSection);
+            }
+
+            List<UserTraionSectionDetail> userTraionSectionDetails = userTraionSectionDetailService.list(
+                    new QueryWrapper<UserTraionSectionDetail>()
+                            .eq("usertrain_section_id",usertrainPlanSection.getUsertrainSectionId())
+                            .eq("user_id",usertrainPlanSection.getUserId())
+                            .eq("coach_id",usertrainPlanSection.getCoachId()));
+            if(userTraionSectionDetails!=null && userTraionSectionDetails.size()>0)
+            {
+                List<String> ids = userTraionSectionDetails.stream().
+                        map(UserTraionSectionDetail::getSectionDetailId).collect(Collectors.toList());
+                userTraionSectionDetailService.removeByIds(ids);
+            }
+            return getResult(ResponseCode.SUCCESS_PROCESSED, usertrainPlanSectionService.removeById(usertrainPlanSection));
+
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+
+    }
+
+    //复制训练小时课时
+    @ApiOperation(value = "/copyUserClassSection", notes = "复制训练小时课时")
+    @PostMapping("/copyUserClassSection")
+    public Result copyUserClassSection(@RequestBody UsertrainPlanSection usertrainPlanSection)
+    {
+        try {
+
+            if (usertrainPlanSection==null || usertrainPlanSection.getUsertrainSectionId() == null
+                    || usertrainPlanSection.getUsertrainSectionId().isEmpty()){
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, usertrainPlanSection);
+            }
+
+            List<UserTraionSectionDetail> userTraionSectionDetails = new ArrayList<>();
+
+            userTraionSectionDetails = this.userTraionSectionDetailService.list(new
+                    QueryWrapper<UserTraionSectionDetail>().eq("user_id",usertrainPlanSection.getUserId())
+                    .eq("coach_id",usertrainPlanSection.getCoachId())
+                    .eq("usertrain_section_id",usertrainPlanSection.getUsertrainSectionId()));
+
+            usertrainPlanSection.setUsertrainSectionId(UUID.randomUUID().toString());
+            if(userTraionSectionDetails!=null && userTraionSectionDetails.size()>0)
+            {
+                userTraionSectionDetails.stream().forEach(item->{
+                    item.setSectionDetailId(UUID.randomUUID().toString());
+                    item.setUsertrainSectionId(usertrainPlanSection.getUsertrainSectionId());
+                });
+
+            }
+
+
+            usertrainPlanSection.setCreateTime(null);
+            usertrainPlanSection.setCreateTime(new Date());
+            usertrainPlanSection.setUserTraionSectionDetails(userTraionSectionDetails);
+
+            //保存数据
+            if(userTraionSectionDetails!=null && userTraionSectionDetails.size()>0)
+            {
+                userTraionSectionDetailService.saveBatch(userTraionSectionDetails);
+            }
+            usertrainPlanSectionService.save(usertrainPlanSection);
+
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,usertrainPlanSection) ;
+
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+
+    }
+
+
+
 
 }
