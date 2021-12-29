@@ -43,7 +43,6 @@ public class TrainPlanController extends BaseController {
     @Autowired
     IUserTraionSectionDetailService userTraionSectionDetailService;
 
-
     @Autowired
     private IUserhealthcheckReportService userhealthcheckReportService;
 
@@ -742,7 +741,6 @@ public class TrainPlanController extends BaseController {
 
     }
 
-
     //删除训练课小节
     @ApiOperation(value = "/delUserSectionDetail", notes = "删除训练课小节")
     @PostMapping("/delUserSectionDetail")
@@ -766,7 +764,6 @@ public class TrainPlanController extends BaseController {
         }
 
     }
-
 
     //得到所有课程课时列表
     @ApiOperation(value = "/getUserSectionList", notes = "编辑训练课下的训练课时")
@@ -798,7 +795,6 @@ public class TrainPlanController extends BaseController {
         }
 
     }
-
 
     //编辑训练课的小时课
     @ApiOperation(value = "/submitUserClassSection", notes = "编辑训练课的小时课")
@@ -852,8 +848,6 @@ public class TrainPlanController extends BaseController {
         }
 
     }
-
-
 
     //编辑训练课的小时课一个细节
     @ApiOperation(value = "/editUserClassSectionDetail", notes = "编辑训练课的小时课")
@@ -975,8 +969,5 @@ public class TrainPlanController extends BaseController {
         }
 
     }
-
-
-
 
 }

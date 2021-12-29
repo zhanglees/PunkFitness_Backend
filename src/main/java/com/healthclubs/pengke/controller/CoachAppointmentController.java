@@ -119,7 +119,8 @@ public class CoachAppointmentController extends BaseController {
         try {
             return getResult(ResponseCode.SUCCESS_PROCESSED,
                     userAppointmentService.list(new QueryWrapper<UserAppointment>()
-                    .apply("TO_DAYS(appointment_time)-TO_DAYS({0}) = 0", date).eq("user_id",userId)));
+                    .apply("TO_DAYS(appointment_time)-TO_DAYS({0}) = 0", date)
+                            .eq("user_id",userId)));
         } catch (PengkeException e) {
             return getResult(e.getCode());
         } catch (Exception e) {
@@ -128,6 +129,34 @@ public class CoachAppointmentController extends BaseController {
         }
 
     }
+
+    //用户 根据时间得到预约
+    @ApiOperation(value = "/getUserAppointmentAllByDate", notes = "根据时间得到预约")
+    @PostMapping("/getUserAppointmentAllByDate")
+    public Result getUserAppointmentAllByDate(@RequestBody  AppointmentDto appointmentDto)
+    {
+        try {
+
+            if(appointmentDto==null ||appointmentDto.getAppointmentTime() == null ||
+            appointmentDto.getCoachId() == null)
+            {
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY,appointmentDto);
+            }
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,
+                    userAppointmentService.list(new QueryWrapper<UserAppointment>()
+                            .apply("TO_DAYS(appointment_time)-TO_DAYS({0}) = 0",
+                                    appointmentDto.getAppointmentTime())
+                            .eq("coach_id",appointmentDto.getCoachId())));
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE);
+        }
+
+    }
+
 
     //教练 根据时间得到预约的人数
     @ApiOperation(value = "/getAppointMembersByDates", notes = "根据时间得到预约")
