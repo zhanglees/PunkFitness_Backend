@@ -780,7 +780,7 @@ public class TrainPlanController extends BaseController {
 
             List<UsertrainPlanSection> usertrainPlanSections = new ArrayList<>();
             usertrainPlanSections = this.usertrainPlanSectionService.list(new QueryWrapper<UsertrainPlanSection>()
-            .isNotNull("complete_time")
+            .isNull("complete_time")
             .eq("user_id",usertrainPlanSection.getUserId())
             .eq("coach_id",usertrainPlanSection.getCoachId())
              .orderByDesc("create_time"));

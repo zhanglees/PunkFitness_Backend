@@ -55,11 +55,12 @@ public class UserAppointment extends Model<UserAppointment> {
     @TableField(exist = false)
     private Integer classHour;
 
-
     public String coachId;
 
     @TableField(exist = false)
     public String userName;
 
+    @TableField(exist = false)
+    public String currentCoachTrainPlainId;
 
 }

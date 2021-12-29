@@ -1,5 +1,9 @@
 server:
-  port: 8023
+  port: 443
+  ssl:
+    key-store: classpath:certificate/6871457_www.zhangleixd.com.pfx
+    key-store-type: PKCS12
+    key-store-password: mJNk5wyh
 upload:
   file-space: D:\wwwroot\resource
 appsetings:

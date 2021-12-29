@@ -1,20 +1,14 @@
 package com.healthclubs.pengke.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.healthclubs.pengke.entity.UserAppointment;
-import com.healthclubs.pengke.entity.UserAppointmentHistory;
-import com.healthclubs.pengke.entity.UserInfo;
-import com.healthclubs.pengke.entity.UsertrainPlanSection;
+import com.healthclubs.pengke.entity.*;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
 import com.healthclubs.pengke.pojo.dto.AppointmentDto;
 import com.healthclubs.pengke.pojo.dto.AppointmentMembersViewDto;
 import com.healthclubs.pengke.pojo.dto.SingInDto;
-import com.healthclubs.pengke.service.IUserAppointmentHistoryService;
-import com.healthclubs.pengke.service.IUserAppointmentService;
-import com.healthclubs.pengke.service.IUserService;
-import com.healthclubs.pengke.service.IUsertrainPlanSectionService;
+import com.healthclubs.pengke.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +22,11 @@ import java.util.*;
 @RequestMapping("/api/coachAppointment")
 public class CoachAppointmentController extends BaseController {
 
+    private static final String trainItemId = "cc7cfd9a-b904-103a-9f13-c5d2cd8b50f0";
+    private static final String exprienceClassPlan = "exprienceClassPlan";
+    private static final String sectionName = "体验课";
+
+
     @Autowired
     IUserAppointmentService userAppointmentService;
 
@@ -40,6 +39,8 @@ public class CoachAppointmentController extends BaseController {
     @Autowired
     IUsertrainPlanSectionService usertrainPlanSectionService;
 
+    @Autowired
+    IUserTrainingPlanService userTrainingPlanService;
     //预约
     @ApiOperation(value = "/appointment", notes = "预约")
     @PostMapping(value = "/appointment")
@@ -138,8 +139,7 @@ public class CoachAppointmentController extends BaseController {
         try {
 
             if(appointmentDto==null ||appointmentDto.getAppointmentTime() == null ||
-            appointmentDto.getCoachId() == null)
-            {
+            appointmentDto.getCoachId() == null){
                 return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY,appointmentDto);
             }
 
@@ -155,8 +155,18 @@ public class CoachAppointmentController extends BaseController {
                     if(userInfo!=null){
                      item.setUserName(userInfo.getUserName());
                     }
-                });
 
+                    UserTrainingPlan userTrainingPlan = userTrainingPlanService.getOne(new
+                            QueryWrapper<UserTrainingPlan>().eq("user_id",appointmentDto.getUserId())
+                    .eq("coach_id",appointmentDto.getCoachId()).last("limit 1"));
+
+                    if(userTrainingPlan!=null){
+                        item.setCurrentCoachTrainPlainId(userTrainingPlan.getTrainingPlanId());
+                    }
+                    else{
+                      //  item.setCurrentCoachTrainPlainId(exprienceClassPlan);
+                    }
+                });
             }
 
             return getResult(ResponseCode.SUCCESS_PROCESSED,userAppointments);
