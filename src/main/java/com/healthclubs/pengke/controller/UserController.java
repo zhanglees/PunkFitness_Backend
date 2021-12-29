@@ -27,7 +27,7 @@ public class UserController extends BaseController {
     @Autowired
     IUserService userService;
 
-    @RequestMapping("/getUserAll")
+    @GetMapping("/getUserAll")
     public Result getUserAll() {
         try {
             return getResult(ResponseCode.SUCCESS_PROCESSED,
@@ -41,7 +41,7 @@ public class UserController extends BaseController {
 
     }
 
-    @RequestMapping("/byid")
+    @GetMapping("/byid")
     public Result byid(String id) {
         try {
             return getResult(ResponseCode.SUCCESS_PROCESSED,
@@ -83,8 +83,17 @@ public class UserController extends BaseController {
     @PostMapping(value = "/getTrainerInfoByCoachId")
     public Result getTrainerInfoByCoachId(String coachId, Integer trainerType) {
         try {
-            return getResult(ResponseCode.SUCCESS_PROCESSED,
-                    userService.getTrainerInfoByCoachIdAndlevel(coachId, trainerType));
+
+            if(trainerType==null){
+              return getResult(ResponseCode.SUCCESS_PROCESSED,
+                        userService.getAppointmentTrainers(coachId));
+            }
+            else
+            {
+                return getResult(ResponseCode.SUCCESS_PROCESSED,
+                        userService.getTrainerInfoByCoachIdAndlevel(coachId, trainerType));
+            }
+
 
         } catch (PengkeException e) {
             return getResult(e.getCode());
@@ -127,8 +136,16 @@ public class UserController extends BaseController {
             }
 
             List<UserInfo> datas = new ArrayList<>();
-            datas = userService.getTrainerInfoByCoachIdAndlevel(membersSearchDto.getCoachId(), membersSearchDto.getTrainerType())
-                    .stream().filter(item -> {
+            if(membersSearchDto.getTrainerType()==null){
+
+                datas = userService.getAppointmentTrainers(membersSearchDto.getCoachId());
+            }
+            else {
+                datas = userService.getTrainerInfoByCoachIdAndlevel(membersSearchDto.getCoachId(), membersSearchDto.getTrainerType());
+
+            }
+
+            datas = datas.stream().filter(item -> {
                         if (item.getUserName().contains(membersSearchDto.getCondition()) ||
                                 item.getPhone().contains(membersSearchDto.getCondition())) {
                             return true;

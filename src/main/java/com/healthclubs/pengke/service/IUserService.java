@@ -18,5 +18,7 @@ public interface IUserService  extends IService<UserInfo>{
 
     List<UserInfo> getTrainerInfoByCoachIdAndlevel(String coachId,Integer customLevel);
 
+    List<UserInfo> getAppointmentTrainers(String coachId);
+
     WiXiFormViewDto wixiLogin(WiXiLoginReturnDto data);
 }

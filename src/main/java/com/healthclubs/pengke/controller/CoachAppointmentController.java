@@ -143,11 +143,24 @@ public class CoachAppointmentController extends BaseController {
                 return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY,appointmentDto);
             }
 
-            return getResult(ResponseCode.SUCCESS_PROCESSED,
-                    userAppointmentService.list(new QueryWrapper<UserAppointment>()
-                            .apply("TO_DAYS(appointment_time)-TO_DAYS({0}) = 0",
-                                    appointmentDto.getAppointmentTime())
-                            .eq("coach_id",appointmentDto.getCoachId())));
+            List<UserAppointment> userAppointments =   userAppointmentService.list(new QueryWrapper<UserAppointment>()
+                    .apply("TO_DAYS(appointment_time)-TO_DAYS({0}) = 0",
+                            appointmentDto.getAppointmentTime())
+                    .eq("coach_id",appointmentDto.getCoachId()));
+
+            if(userAppointments!=null && userAppointments.size()>0){
+
+                userAppointments.stream().forEach(item->{
+                    UserInfo userInfo = userService.getById(item.getUserId());
+                    if(userInfo!=null){
+                     item.setUserName(userInfo.getUserName());
+                    }
+                });
+
+            }
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,userAppointments);
+
         } catch (PengkeException e) {
             return getResult(e.getCode());
         } catch (Exception e) {

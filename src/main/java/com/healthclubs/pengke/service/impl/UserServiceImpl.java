@@ -97,6 +97,19 @@ public class UserServiceImpl extends ServiceImpl<IUserMapper, UserInfo>
     }
 
     @Override
+    public List<UserInfo> getAppointmentTrainers(String coachId) {
+        try
+        {
+            List<UserInfo> userData = baseMapper.getAppointmentTrainers(coachId);
+            return  userData;
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
+
+    @Override
     public WiXiFormViewDto wixiLogin(WiXiLoginReturnDto data) {
 
         try

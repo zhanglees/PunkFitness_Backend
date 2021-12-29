@@ -58,5 +58,8 @@ public class UserAppointment extends Model<UserAppointment> {
 
     public String coachId;
 
+    @TableField(exist = false)
+    public String userName;
+
 
 }

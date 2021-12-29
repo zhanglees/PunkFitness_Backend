@@ -54,6 +54,19 @@ GROUP BY a.id
      </select>
 
 
+    <select id="getAppointmentTrainers"
+            resultType="com.healthclubs.pengke.entity.UserInfo">
+        select a.* ,sum(b.is_complete =1) as singInNum ,
+        sum(b.is_complete) as appointmentNum from userinfo as a left JOIN userappointment as b on
+a.id = b.user_id  inner join
+         studentandcoach as c on
+         a.id = c.student_id
+where c.coach_id = #{coachId}
+GROUP BY a.id
+
+     </select>
+
+
      <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id,wxid,head_img,phone,birthday,sex,user_name, age, email,customer_tag,remarks,coustom_level
