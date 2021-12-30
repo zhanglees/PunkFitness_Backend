@@ -150,5 +150,32 @@ public class UserServiceImpl extends ServiceImpl<IUserMapper, UserInfo>
         }
     }
 
+    @Override
+    public List<UserInfo> getUsersByCoachId(String coachId) {
+
+        try
+        {
+            return baseMapper.getUsersByCoachId(coachId);
+        }
+        catch (Exception ex){
+            throw ex;
+        }
+
+
+    }
+
+    @Override
+    public List<UserInfo> getUsersByCoachIdAndlevel(String coachId, Integer customLevel) {
+
+        try
+        {
+            return baseMapper.getUsersByCoachIdAndlevel(coachId,customLevel);
+        }
+        catch (Exception ex){
+            throw ex;
+        }
+
+    }
+
 
 }

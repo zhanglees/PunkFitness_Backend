@@ -1,6 +1,7 @@
 package com.healthclubs.pengke.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.healthclubs.pengke.entity.TempClassNums;
 import com.healthclubs.pengke.entity.UserInfo;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
@@ -8,6 +9,7 @@ import com.healthclubs.pengke.pojo.Result;
 import com.healthclubs.pengke.pojo.dto.MembersSearchDto;
 import com.healthclubs.pengke.pojo.dto.RegisterDto;
 import com.healthclubs.pengke.service.IUserService;
+import com.healthclubs.pengke.service.IUserTrainItemService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class UserController extends BaseController {
 
     @Autowired
     IUserService userService;
+
+    @Autowired
+    IUserTrainItemService userTrainItemService;
 
     @GetMapping("/getUserAll")
     public Result getUserAll() {
@@ -84,16 +89,30 @@ public class UserController extends BaseController {
     public Result getTrainerInfoByCoachId(String coachId, Integer trainerType) {
         try {
 
+            List<UserInfo> userInfos = new ArrayList<>();
             if(trainerType==null){
-              return getResult(ResponseCode.SUCCESS_PROCESSED,
-                        userService.getAppointmentTrainers(coachId));
+
+                userInfos = userService.getUsersByCoachId(coachId);
             }
             else
             {
-                return getResult(ResponseCode.SUCCESS_PROCESSED,
-                        userService.getTrainerInfoByCoachIdAndlevel(coachId, trainerType));
+                userInfos =  userService.getUsersByCoachIdAndlevel(coachId, trainerType);
+
             }
 
+            if(userInfos!=null && userInfos.size()>0){
+                userInfos.stream().forEach(item->{
+
+                    TempClassNums tempClassNums = userTrainItemService.getUserCompleteClass(item.getId());
+
+                    if(tempClassNums!=null){
+                        item.setSingInNum(tempClassNums.getCompleteClassNum());
+                        item.setTrainClassNumbers(tempClassNums.getTotalClassNum());
+                    }
+                });
+            }
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,userInfos);
 
         } catch (PengkeException e) {
             return getResult(e.getCode());

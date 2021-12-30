@@ -1,6 +1,7 @@
 package com.healthclubs.pengke.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.healthclubs.pengke.entity.TempClassNums;
 import com.healthclubs.pengke.entity.UserTrainItem;
 import com.healthclubs.pengke.mapper.IUserTrainItemMapper;
 import com.healthclubs.pengke.service.IUserTrainItemService;
@@ -15,5 +16,10 @@ public class UserTrainItemServiceImpl extends ServiceImpl<IUserTrainItemMapper, 
     @Override
     public List<UserTrainItem> getUserClassByCoachId(String userId, String coachId) {
         return baseMapper.getUserClassByCoachId(userId,coachId);
+    }
+
+    @Override
+    public TempClassNums getUserCompleteClass(String userId) {
+        return baseMapper.getUserCompleteClass(userId);
     }
 }

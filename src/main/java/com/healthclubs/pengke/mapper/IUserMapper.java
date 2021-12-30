@@ -15,4 +15,8 @@ public interface IUserMapper extends BaseMapper<UserInfo> {
     List<UserInfo> getTrainerInfoByCoachIdAndlevel(String coachId,Integer customLevel);
 
     List<UserInfo> getAppointmentTrainers(String coachId);
+
+    List<UserInfo> getUsersByCoachId(String coachId);
+
+    List<UserInfo> getUsersByCoachIdAndlevel(String coachId,Integer customLevel);
 }

@@ -12,4 +12,17 @@ where a.user_id = #{userId} and a.coach_id = #{coachId}
 GROUP BY a.user_trainitem_id
 order by b.create_time asc
      </select>
+
+  <select id="getUserCompleteClass" resultType="com.healthclubs.pengke.entity.TempClassNums">
+      select sum(f.class_num) as totalClassNum ,sum(f.completeSections) as completeClassNum from
+ (select a.*,b.class_name,c.user_name as coachName,SUM(d.complete_time  is not null) as completeSections from usertrainitem as a
+INNER join classinfo as b on a.class_id = b.class_id
+INNER JOIN userinfo as c on a.coach_id = c.id
+left join usertrainplansection as d on a.user_trainitem_id = d.user_trainitem_id
+where a.user_id = #{userId}
+GROUP BY a.user_trainitem_id
+order by b.create_time asc) as f
+
+  </select>
+
 </mapper>
