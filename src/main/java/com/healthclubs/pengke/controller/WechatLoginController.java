@@ -5,10 +5,7 @@ import com.healthclubs.pengke.entity.UserInfo;
 import com.healthclubs.pengke.exception.PengkeException;
 import com.healthclubs.pengke.pojo.ResponseCode;
 import com.healthclubs.pengke.pojo.Result;
-import com.healthclubs.pengke.pojo.dto.CoachInfoDto;
-import com.healthclubs.pengke.pojo.dto.RegisterDto;
-import com.healthclubs.pengke.pojo.dto.WiXiFormViewDto;
-import com.healthclubs.pengke.pojo.dto.WiXiLoginReturnDto;
+import com.healthclubs.pengke.pojo.dto.*;
 import com.healthclubs.pengke.service.IUserService;
 import com.healthclubs.pengke.utils.HttpService;
 import io.swagger.annotations.Api;
@@ -46,7 +43,7 @@ public class WechatLoginController extends BaseController {
      * 开放平台回调url
      * 注意：域名地址要和在微信端 回调域名配置 地址一直，否则会报回调地址参数错误
      */
-    private final static String OPEN_REDIRECT_URL = "http://%s/api/wechatLogin/callback";
+    private final static String OPEN_REDIRECT_URL = "https://%s/api/wechatLogin/callback";
 
     /**
      * 微信审核通过后的appid
@@ -58,6 +55,9 @@ public class WechatLoginController extends BaseController {
     private final static String OPEN_CHECK_URL =
             "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code";
 
+
+    private final static String WIXI_USERINFO_URL =
+            "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN";
 
     //身份请求地址
     private  final static  String OPEN_USERINFO_ACCESS = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN";
@@ -107,6 +107,14 @@ public class WechatLoginController extends BaseController {
             String retrurnSuccess = "0";
             if(result.getErrcode().equals(retrurnSuccess)&& result.getOpenid()!=null)
             {
+
+                //String questUserInfoUrl = String.format(WIXI_USERINFO_URL,result.getSession_key(),OPEN_APPID);
+               // WiXinUserInfoDto wiXinUserInfoDto = HttpService.getCurrentService().GetUrl(questUserInfoUrl,WiXinUserInfoDto.class);
+                //设置头像性别等
+                //if(wiXinUserInfoDto!=null){
+                //    result.setWiXinUserInfoDto(wiXinUserInfoDto);
+               // }
+
                 WiXiFormViewDto wiXiFormViewDto = new WiXiFormViewDto();
                 wiXiFormViewDto = userService.wixiLogin(result);
                 return getResult(ResponseCode.SUCCESS_PROCESSED, wiXiFormViewDto

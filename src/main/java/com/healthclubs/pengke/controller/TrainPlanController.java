@@ -65,9 +65,9 @@ public class TrainPlanController extends BaseController {
 
                 classInfos.stream().forEach(item -> {
                     List<ClassContent> classContents = classContentService.list(new QueryWrapper<ClassContent>()
+                            .eq("train_class_id", item.getClassId())
+                            .and(wappter->wappter.eq("owner", coachId).or().eq("owner", "system")));
 
-                            .eq("owner", coachId).or().eq("owner", "system")
-                            .eq("train_class_id", item.getClassId()));
                     if (classContents != null && classContents.size() > 0) {
                         item.setClassContents(classContents);
                     }

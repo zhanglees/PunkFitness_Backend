@@ -51,4 +51,15 @@ public class WiXiLoginReturnDto {
     public String errcode = "0";
 
     public String errmsg;
+
+
+   // public WiXinUserInfoDto getWiXinUserInfoDto() {
+    //    return wiXinUserInfoDto;
+   // }
+
+   // public void setWiXinUserInfoDto(WiXinUserInfoDto wiXinUserInfoDto) {
+    //    this.wiXinUserInfoDto = wiXinUserInfoDto;
+   // }
+
+   // public WiXinUserInfoDto wiXinUserInfoDto;
 }

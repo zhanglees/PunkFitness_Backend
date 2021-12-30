@@ -4,7 +4,7 @@ upload:
   file-space: C:\Project\mywork\newjiaoyu\resource
 appsetings:
   version-key : 1.10.2
-  domain : 182.92.189.147
+  domain : www.zhangleixd.com
 spring:
   #    国际化文件位置
   messages.basename: i18n/message

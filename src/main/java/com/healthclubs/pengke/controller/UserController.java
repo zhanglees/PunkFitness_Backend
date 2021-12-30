@@ -166,4 +166,31 @@ public class UserController extends BaseController {
         }
     }
 
+
+
+    //搜索会员
+    @ApiOperation(value = "/modifyCoachInfoById", notes = "修改人员信息")
+    @PostMapping(value = "/modifyCoachInfoById")
+    public Result modifyUserInfoById(@RequestBody UserInfo userInfo) {
+        try {
+
+            if (userInfo == null || userInfo.getId()==null ||userInfo.getId().isEmpty()) {
+
+                return getResult(ResponseCode.PARAMETER_CANNOT_EMPTY, userInfo);
+            }
+
+            userService.updateById(userInfo);
+
+            return getResult(ResponseCode.SUCCESS_PROCESSED,
+                    userInfo);
+
+        } catch (PengkeException e) {
+            return getResult(e.getCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getResult(ResponseCode.GENERIC_FAILURE, e.getMessage());
+        }
+    }
+
+
 }
