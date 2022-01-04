@@ -7,6 +7,7 @@ import com.healthclubs.pengke.mapper.IUserMapper;
 import com.healthclubs.pengke.pojo.dto.RegisterDto;
 import com.healthclubs.pengke.pojo.dto.WiXiFormViewDto;
 import com.healthclubs.pengke.pojo.dto.WiXiLoginReturnDto;
+import com.healthclubs.pengke.pojo.dto.WiXinUserInfoDto;
 import com.healthclubs.pengke.service.IStudentAndCoachService;
 import com.healthclubs.pengke.service.IUserService;
 import com.healthclubs.pengke.utils.CacheService;
@@ -121,6 +122,21 @@ public class UserServiceImpl extends ServiceImpl<IUserMapper, UserInfo>
                 userInfo = new UserInfo();
                 userInfo.setId(UUID.randomUUID().toString());
                 userInfo.setWxid(data.getOpenid());
+
+                //if(data.getWiXinUserInfoDto()!=null){
+                //    WiXinUserInfoDto wiXinUserInfoDto = data.getWiXinUserInfoDto();
+
+                //    if(wiXinUserInfoDto.getNickName()!=null){
+                //        userInfo.setUserName(wiXinUserInfoDto.getNickName());
+               //     }
+               //     else {
+               //         userInfo.setUserName("System"+System.currentTimeMillis());
+               //     }
+
+                //    userInfo.setHeadImg(wiXinUserInfoDto.getAvatarUrl());
+
+               // }
+
                 userInfo.setUserName("System"+System.currentTimeMillis());
                 userInfo.setSessionKey(data.getSession_key());
                 userInfo.setVersionKey(versionKey);

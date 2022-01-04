@@ -53,13 +53,13 @@ public class WiXiLoginReturnDto {
     public String errmsg;
 
 
-   // public WiXinUserInfoDto getWiXinUserInfoDto() {
-    //    return wiXinUserInfoDto;
-   // }
+    public WiXinUserInfoDto getWiXinUserInfoDto() {
+        return wiXinUserInfoDto;
+    }
 
-   // public void setWiXinUserInfoDto(WiXinUserInfoDto wiXinUserInfoDto) {
-    //    this.wiXinUserInfoDto = wiXinUserInfoDto;
-   // }
+    public void setWiXinUserInfoDto(WiXinUserInfoDto wiXinUserInfoDto) {
+        this.wiXinUserInfoDto = wiXinUserInfoDto;
+    }
 
-   // public WiXinUserInfoDto wiXinUserInfoDto;
+    public WiXinUserInfoDto wiXinUserInfoDto;
 }

@@ -1,5 +1,6 @@
 package com.healthclubs.pengke.filter;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.*;
@@ -8,6 +9,12 @@ import org.springframework.web.servlet.config.annotation.*;
 @Configuration
 @EnableWebMvc
 public class InterceptorConfig implements WebMvcConfigurer {
+
+
+    /** 文件地址 */
+    @Value("${upload.file-space}")
+    private String filePath;
+
 
    /* public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new RequestInterceptor()).addPathPatterns("/**").
@@ -63,6 +70,8 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations("file:"+filePath+"/");
     }
 
     @Override

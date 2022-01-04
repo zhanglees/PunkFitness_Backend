@@ -39,6 +39,10 @@ public class WechatLoginController extends BaseController {
     private final static String OPEN_QRCODE_URL =
             "https://open.weixin.qq.com/connect/qrconnect?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_login&state=%s#wechat_redirect";
 
+    private final static String OPEN_QRCODE_URL2 =
+            "https://open.weixin.qq.com/connect/qrconnect?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_login&state=%s#wechat_redirect";
+
+
     /**
      * 开放平台回调url
      * 注意：域名地址要和在微信端 回调域名配置 地址一直，否则会报回调地址参数错误
@@ -108,17 +112,17 @@ public class WechatLoginController extends BaseController {
             if(result.getErrcode().equals(retrurnSuccess)&& result.getOpenid()!=null)
             {
 
-                //String questUserInfoUrl = String.format(WIXI_USERINFO_URL,result.getSession_key(),OPEN_APPID);
-               // WiXinUserInfoDto wiXinUserInfoDto = HttpService.getCurrentService().GetUrl(questUserInfoUrl,WiXinUserInfoDto.class);
+               // String questUserInfoUrl = String.format(WIXI_USERINFO_URL,result.getSession_key(),result.getOpenid());
+              //  WiXinUserInfoDto wiXinUserInfoDto = HttpService.getCurrentService().GetUrl(questUserInfoUrl,WiXinUserInfoDto.class);
                 //设置头像性别等
-                //if(wiXinUserInfoDto!=null){
-                //    result.setWiXinUserInfoDto(wiXinUserInfoDto);
-               // }
+              //  if(wiXinUserInfoDto!=null){
+              //      result.setWiXinUserInfoDto(wiXinUserInfoDto);
+              //  }
 
                 WiXiFormViewDto wiXiFormViewDto = new WiXiFormViewDto();
                 wiXiFormViewDto = userService.wixiLogin(result);
-                return getResult(ResponseCode.SUCCESS_PROCESSED, wiXiFormViewDto
-                );
+                return getResult(ResponseCode.SUCCESS_PROCESSED, wiXiFormViewDto);
+
             }
             else
             {
