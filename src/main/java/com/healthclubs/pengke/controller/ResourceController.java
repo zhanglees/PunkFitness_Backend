@@ -33,8 +33,14 @@ public class ResourceController extends BaseController {
     @Value("${upload.file-space}")
     private String fileSpace;
 
+    /** 版本key */
+    @Value("${appsetings.domain}")
+    private String dominUrl;
+
     @Autowired
     private IResourceInfoService resourceInfoService;
+
+    private static final String staticPath = "static";
 
     //创建自定义标签
     @ApiOperation(value = "/uploadFile", notes = "上传文件")
@@ -88,7 +94,9 @@ public class ResourceController extends BaseController {
 
                     ResourceInfo resource = new ResourceInfo();
                     resource.setResourceId(fileDbId);
-                    resource.setResourcePath(filePathFace);
+                    String dbpath = dominUrl + "/" + staticPath + uploadPathDB + "/" + fileName;
+
+                    resource.setResourcePath(dbpath);
                     resource.setOwner(userId);
 
                     resource.setCreateTime(new Date());
